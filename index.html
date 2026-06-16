@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[ System ] · Hunter Drew</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#000a14;--panel:#020f1e;--panel2:#030d1a;
+  --blue:#00aaff;--blue2:#0066cc;--blue-glow:rgba(0,170,255,0.15);
+  --blue-line:rgba(0,170,255,0.4);--blue-bright:#55ccff;
+  --inner:#001428;--text:#e8f4ff;--text2:#6aaad4;--text3:#2a5a80;
+  --green:#00ffaa;--green2:rgba(0,255,170,0.2);
+  --red:#ff3355;--red2:rgba(255,51,85,0.2);
+  --amber:#ffaa00;--amber2:rgba(255,170,0,0.15);
+  --purple:#aa55ff;--purple2:rgba(170,85,255,0.15);
+  --shadow-c:#cc44ff;
+  --mono:'Courier New',Courier,monospace;
+  --orb:'Arial Black','Arial Bold',Arial,sans-serif;
+  --raj:'Arial',sans-serif;
+}
+html,body{min-height:100vh;background:var(--void);font-family:var(--mono);color:var(--text);display:flex;justify-content:center;padding:40px 20px 80px;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(0,100,200,0.12) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 50% 100%,rgba(0,60,120,0.08) 0%,transparent 60%);pointer-events:none;z-index:0;}
+#root{width:100%;max-width:1400px;position:relative;z-index:1;}
+
+/* Frame */
+.frame{position:relative;border:1px solid var(--blue);background:var(--panel);overflow:visible;}
+.frame::before{content:'';position:absolute;inset:4px;border:1px solid rgba(0,170,255,0.2);pointer-events:none;z-index:0;}
+.frame::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 30px rgba(0,170,255,0.25),inset 0 0 30px rgba(0,170,255,0.05);pointer-events:none;z-index:0;}
+.cb{position:absolute;width:24px;height:24px;z-index:2;}
+.cb::before,.cb::after{content:'';position:absolute;background:var(--blue);}
+.cb::before{width:100%;height:2px;}.cb::after{width:2px;height:100%;}
+.cb.tl{top:-2px;left:-2px;}.cb.tl::before{top:0;left:0;}.cb.tl::after{top:0;left:0;}
+.cb.tr{top:-2px;right:-2px;}.cb.tr::before{top:0;right:0;}.cb.tr::after{top:0;right:0;}
+.cb.bl{bottom:-2px;left:-2px;}.cb.bl::before{bottom:0;left:0;}.cb.bl::after{bottom:0;left:0;}
+.cb.br{bottom:-2px;right:-2px;}.cb.br::before{bottom:0;right:0;}.cb.br::after{bottom:0;right:0;}
+.frame-inner{padding:40px 50px;position:relative;z-index:1;}
+.scanlines{position:absolute;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);}
+
+/* Header */
+.hdr{text-align:center;padding-bottom:32px;margin-bottom:36px;position:relative;}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.hdr-sys{font-family:var(--orb);font-size:11px;letter-spacing:8px;color:var(--blue);margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:10px;}
+.save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);opacity:0;transition:opacity 0.3s;}
+.save-dot.show{opacity:1;}
+.hdr-name{font-family:var(--orb);font-size:48px;font-weight:900;color:#fff;letter-spacing:8px;line-height:1;text-shadow:0 0 20px rgba(0,170,255,0.5),0 0 40px rgba(0,170,255,0.2);margin-bottom:10px;}
+.hdr-day{font-size:11px;color:var(--text2);letter-spacing:6px;margin-bottom:18px;}
+.rank-wrap{display:flex;align-items:center;justify-content:center;gap:0;}
+.rank-deco{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--blue));}
+.rank-deco.r{background:linear-gradient(90deg,var(--blue),transparent);}
+.rank-badge{padding:8px 28px;border:1px solid var(--blue);border-left:none;border-right:none;color:var(--blue-bright);font-family:var(--orb);font-size:12px;font-weight:600;letter-spacing:5px;background:rgba(0,170,255,0.08);position:relative;}
+.rank-badge::before,.rank-badge::after{content:'◆';position:absolute;top:50%;transform:translateY(-50%);color:var(--blue);font-size:8px;}
+.rank-badge::before{left:-14px;}.rank-badge::after{right:-14px;}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat-box{border:1px solid var(--blue-line);background:var(--inner);padding:20px 12px;text-align:center;position:relative;overflow:hidden;}
+.stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.stat-lbl{font-family:var(--orb);font-size:10px;color:var(--text3);letter-spacing:4px;margin-bottom:8px;}
+.stat-val{font-family:var(--orb);font-size:48px;font-weight:900;color:var(--blue-bright);line-height:1;text-shadow:0 0 15px rgba(0,170,255,0.4);}
+.stat-name{font-size:10px;color:var(--text3);margin-top:6px;letter-spacing:2px;}
+
+/* XP Bar */
+.xp-wrap{border:1px solid var(--blue-line);background:var(--inner);padding:16px 24px;margin-bottom:32px;position:relative;}
+.xp-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.xp-top{display:flex;justify-content:space-between;font-family:var(--orb);font-size:10px;color:var(--text2);letter-spacing:3px;margin-bottom:10px;}
+.xp-track{height:8px;background:rgba(0,100,200,0.15);border:1px solid rgba(0,170,255,0.25);position:relative;overflow:hidden;}
+.xp-track::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 10px,rgba(0,170,255,0.05) 10px,rgba(0,170,255,0.05) 11px);}
+.xp-fill{height:100%;background:linear-gradient(90deg,#0055aa,var(--blue),var(--blue-bright));transition:width 0.6s ease;position:relative;}
+.xp-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:white;opacity:0.6;}
+.xp-bot{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:8px;letter-spacing:2px;}
+
+/* Flash */
+.flash{border:1px solid;padding:12px 20px;font-size:11px;margin-bottom:28px;display:flex;align-items:center;gap:12px;letter-spacing:1px;}
+.flash.ok{border-color:rgba(0,255,170,0.4);color:var(--green);background:var(--green2);}
+.flash.bad{border-color:rgba(255,51,85,0.4);color:var(--red);background:var(--red2);}
+.flash.info{border-color:var(--blue-line);color:var(--blue-bright);background:var(--blue-glow);}
+
+/* Section headers */
+.sec{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-family:var(--orb);font-size:11px;font-weight:600;letter-spacing:4px;}
+.sec.req{color:var(--blue-bright);}.sec.bon{color:var(--amber);}.sec.spec{color:var(--purple);}.sec.boss{color:var(--shadow-c);}
+.sec-line{flex:1;height:1px;}
+.sec.req .sec-line{background:linear-gradient(90deg,var(--blue-line),transparent);}
+.sec.bon .sec-line{background:linear-gradient(90deg,rgba(255,170,0,0.4),transparent);}
+.sec.spec .sec-line{background:linear-gradient(90deg,rgba(170,85,255,0.4),transparent);}
+.sec.boss .sec-line{background:linear-gradient(90deg,rgba(200,68,255,0.4),transparent);}
+.chip{font-family:var(--mono);font-size:9px;padding:2px 10px;border:1px solid;letter-spacing:2px;}
+.sec.req .chip{border-color:var(--blue-line);color:var(--text2);}
+.sec.bon .chip{border-color:rgba(255,170,0,0.4);color:var(--amber);}
+.sec.spec .chip{border-color:rgba(170,85,255,0.4);color:var(--purple);}
+.sec.boss .chip{border-color:rgba(200,68,255,0.4);color:var(--shadow-c);}
+
+.prog-bar{height:2px;margin-bottom:16px;background:rgba(0,170,255,0.1);}
+.prog-fill{height:100%;background:var(--blue);transition:width 0.4s;}
+.q-list{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;}
+
+/* Quest items */
+.q-item{border:1px solid rgba(0,170,255,0.2);background:var(--inner);padding:16px 22px;display:flex;align-items:center;gap:16px;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.2s,background 0.2s;user-select:none;}
+.q-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);opacity:0;transition:opacity 0.2s;}
+.q-item:hover{border-color:rgba(0,170,255,0.5);background:rgba(0,30,60,0.8);}
+.q-item:hover::before{opacity:1;}
+.q-item.done{opacity:0.45;border-color:rgba(0,255,170,0.2);}
+.q-item.done::before{background:var(--green);opacity:1;}
+.q-item.done .q-name{text-decoration:line-through;color:var(--text3);}
+.q-item.bon{border-color:rgba(255,170,0,0.2);background:rgba(20,12,0,0.8);}
+.q-item.bon::before{background:var(--amber);}
+.q-item.bon:hover{border-color:rgba(255,170,0,0.5);}
+.q-item.dc{border-color:rgba(170,85,255,0.25);background:rgba(15,5,30,0.9);}
+.q-item.dc::before{background:var(--purple);}
+.q-item.dc:hover{border-color:rgba(170,85,255,0.55);}
+.q-item.bq{border-color:rgba(200,68,255,0.3);background:rgba(20,0,30,0.9);}
+.q-item.bq::before{background:var(--shadow-c);}
+.q-item.bq:hover{border-color:rgba(200,68,255,0.6);}
+.q-item.shq{border-color:rgba(100,50,180,0.2);background:rgba(5,0,15,0.9);}
+.q-item.shq::before{background:rgba(100,50,180,0.5);}
+.q-check{width:22px;height:22px;border:1px solid rgba(0,170,255,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+.q-item.bon .q-check{border-color:rgba(255,170,0,0.4);}
+.q-item.dc .q-check{border-color:rgba(170,85,255,0.4);}
+.q-item.bq .q-check{border-color:rgba(200,68,255,0.4);}
+.q-item.shq .q-check{border-color:rgba(100,50,180,0.25);}
+.q-item.done .q-check{border-color:var(--green);color:var(--green);}
+.q-name{font-family:var(--raj);font-size:17px;font-weight:600;flex:1;letter-spacing:1px;color:var(--text);}
+.q-item.bon .q-name{color:#ffd870;}
+.q-item.dc .q-name{color:#cc99ff;}
+.q-item.bq .q-name{color:#ee99ff;}
+.q-item.shq .q-name{color:#443366;}
+.q-sub{font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:0.5px;}
+.q-item.bon .q-sub{color:#7a5a10;}
+.q-item.dc .q-sub{color:#5a3a88;}
+.q-item.bq .q-sub{color:#602070;}
+.q-item.shq .q-sub{color:#1a0a2a;}
+.q-xp{font-family:var(--orb);font-size:14px;font-weight:700;white-space:nowrap;}
+.q-xp.up{color:var(--green);text-shadow:0 0 8px rgba(0,255,170,0.4);}
+.q-xp.ba{color:var(--amber);text-shadow:0 0 8px rgba(255,170,0,0.3);}
+.q-xp.bp{color:var(--purple);text-shadow:0 0 8px rgba(170,85,255,0.3);}
+.q-xp.bs{color:var(--shadow-c);text-shadow:0 0 8px rgba(200,68,255,0.3);}
+.q-xp.bh{color:#221133;}
+.boss-prog-track{height:2px;background:rgba(200,68,255,0.15);margin-top:6px;}
+.boss-prog-fill{height:100%;background:var(--shadow-c);transition:width 0.4s;}
+.boss-days{font-size:9px;color:var(--shadow-c);letter-spacing:3px;margin-top:4px;}
+
+/* Violations */
+.vio-hdr{display:flex;align-items:center;gap:12px;font-family:var(--orb);font-size:11px;font-weight:600;color:var(--red);letter-spacing:4px;margin-bottom:14px;}
+.vio-hdr-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,51,85,0.4),transparent);}
+.v-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.v-item{border:1px solid rgba(255,51,85,0.2);background:rgba(20,0,5,0.8);padding:16px 22px;display:flex;align-items:center;gap:16px;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.2s;user-select:none;}
+.v-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);opacity:0;transition:opacity 0.2s;}
+.v-item:hover{border-color:rgba(255,51,85,0.5);}
+.v-item:hover::before{opacity:1;}
+.v-item.used{opacity:0.25;pointer-events:none;}
+.v-ico{width:36px;height:36px;border:1px solid rgba(255,51,85,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--red);font-size:16px;}
+.v-name{font-family:var(--raj);font-size:17px;font-weight:600;color:#ffaaaa;letter-spacing:1px;}
+.v-sub{font-size:10px;color:#5a1a22;margin-top:3px;}
+.v-pen{font-family:var(--orb);font-size:14px;font-weight:700;color:var(--red);margin-left:auto;white-space:nowrap;text-shadow:0 0 8px rgba(255,51,85,0.4);}
+
+/* Divider */
+.div-line{height:1px;margin:28px 0;background:linear-gradient(90deg,transparent,var(--blue-line),transparent);position:relative;}
+.div-line::before{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--blue);font-size:8px;background:var(--panel);padding:0 8px;}
+
+/* Footer */
+.ftr{display:flex;justify-content:space-between;align-items:center;padding-top:24px;margin-top:16px;position:relative;}
+.ftr::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue-line),transparent);}
+.streak-wrap{display:flex;align-items:center;gap:14px;}
+.streak-lbl{font-family:var(--orb);font-size:10px;color:var(--text3);letter-spacing:4px;}
+.streak-val{font-family:var(--orb);font-size:44px;font-weight:900;color:var(--amber);text-shadow:0 0 20px rgba(255,170,0,0.4);line-height:1;}
+.streak-days{font-family:var(--orb);font-size:10px;color:var(--text3);letter-spacing:3px;align-self:flex-end;margin-bottom:4px;}
+.btn-row{display:flex;gap:12px;}
+.btn{padding:10px 28px;font-family:var(--orb);font-size:10px;letter-spacing:3px;border:1px solid;background:transparent;cursor:pointer;position:relative;overflow:hidden;transition:all 0.2s;}
+.btn::before{content:'◆';position:absolute;left:10px;top:50%;transform:translateY(-50%) scale(0);font-size:7px;transition:transform 0.2s;}
+.btn:hover::before{transform:translateY(-50%) scale(1);}
+.btn-reset{border-color:var(--blue-line);color:var(--text3);}
+.btn-reset:hover{border-color:var(--blue);color:var(--blue-bright);background:var(--blue-glow);}
+.btn-end{border-color:rgba(255,51,85,0.4);color:var(--red);}
+.btn-end:hover{border-color:var(--red);background:var(--red2);}
+.debuff{font-family:var(--orb);font-size:9px;color:var(--red);border:1px solid rgba(255,51,85,0.4);padding:5px 14px;letter-spacing:3px;}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,5,12,0.92);display:flex;align-items:center;justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity 0.35s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.ov-box{position:relative;max-width:560px;width:92%;border:1px solid var(--blue);background:var(--panel);padding:52px 60px;text-align:center;}
+.ov-box::before{content:'';position:absolute;inset:6px;border:1px solid rgba(0,170,255,0.15);pointer-events:none;}
+.ov-box::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 40px rgba(0,170,255,0.3),inset 0 0 40px rgba(0,170,255,0.05);pointer-events:none;}
+.ov-box.pen{border-color:var(--red);}
+.ov-box.pen::after{box-shadow:0 0 40px rgba(255,51,85,0.3),inset 0 0 40px rgba(255,51,85,0.05);}
+.ov-box.shad{border-color:var(--purple);}
+.ov-box.shad::after{box-shadow:0 0 40px rgba(170,85,255,0.3),inset 0 0 40px rgba(170,85,255,0.05);}
+.ov-box.boss-win{border-color:var(--shadow-c);}
+.ov-box.boss-win::after{box-shadow:0 0 40px rgba(200,68,255,0.3),inset 0 0 40px rgba(200,68,255,0.05);}
+.ov-notif{font-family:var(--orb);font-size:10px;letter-spacing:6px;color:var(--blue-bright);margin-bottom:24px;}
+.ov-box.pen .ov-notif{color:var(--red);}
+.ov-box.shad .ov-notif{color:var(--purple);}
+.ov-box.boss-win .ov-notif{color:var(--shadow-c);}
+.ov-deco{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px;}
+.ov-deco-line{width:60px;height:1px;background:var(--blue);}
+.ov-box.pen .ov-deco-line{background:var(--red);}
+.ov-box.shad .ov-deco-line{background:var(--purple);}
+.ov-box.boss-win .ov-deco-line{background:var(--shadow-c);}
+.ov-diamond{width:10px;height:10px;border:2px solid var(--blue);transform:rotate(45deg);}
+.ov-box.pen .ov-diamond{border-color:var(--red);}
+.ov-box.shad .ov-diamond{border-color:var(--purple);}
+.ov-box.boss-win .ov-diamond{border-color:var(--shadow-c);}
+.ov-rank{font-family:var(--orb);font-size:32px;font-weight:900;color:#fff;letter-spacing:4px;margin-bottom:12px;text-shadow:0 0 20px rgba(0,170,255,0.5);}
+.ov-box.pen .ov-rank{text-shadow:0 0 20px rgba(255,51,85,0.5);}
+.ov-box.shad .ov-rank{text-shadow:0 0 20px rgba(170,85,255,0.5);}
+.ov-box.boss-win .ov-rank{text-shadow:0 0 20px rgba(200,68,255,0.5);}
+.ov-sub{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:3px;margin-bottom:36px;}
+.ov-btn{padding:12px 44px;border:1px solid var(--blue);background:rgba(0,100,200,0.1);color:var(--blue-bright);font-family:var(--orb);font-size:10px;letter-spacing:4px;cursor:pointer;transition:all 0.2s;}
+.ov-btn:hover{background:rgba(0,170,255,0.2);box-shadow:0 0 20px rgba(0,170,255,0.2);}
+.ov-box.pen .ov-btn{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.1);}
+.ov-box.shad .ov-btn{border-color:var(--purple);color:var(--purple);background:rgba(170,85,255,0.1);}
+.ov-box.boss-win .ov-btn{border-color:var(--shadow-c);color:var(--shadow-c);background:rgba(200,68,255,0.1);}
+
+/* Loot overlay */
+.loot-overlay{position:fixed;inset:0;background:rgba(0,5,12,0.95);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 0.35s;}
+.loot-overlay.show{opacity:1;pointer-events:all;}
+.loot-box{position:relative;max-width:500px;width:92%;border:1px solid var(--blue);background:var(--panel);padding:44px 52px;text-align:center;}
+.loot-box::before{content:'';position:absolute;inset:6px;border:1px solid rgba(0,170,255,0.15);pointer-events:none;}
+.loot-box.common{border-color:#888;}.loot-box.uncommon{border-color:#00cc66;}.loot-box.rare{border-color:#0088ff;}.loot-box.epic{border-color:#aa44ff;}.loot-box.legendary{border-color:#ffaa00;}
+.loot-box.common::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 20px rgba(136,136,136,0.2);pointer-events:none;}
+.loot-box.uncommon::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 30px rgba(0,204,102,0.25);pointer-events:none;}
+.loot-box.rare::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 35px rgba(0,136,255,0.3);pointer-events:none;}
+.loot-box.epic::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 40px rgba(170,68,255,0.35);pointer-events:none;}
+.loot-box.legendary::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 50px rgba(255,170,0,0.4);pointer-events:none;}
+.loot-src{font-family:var(--orb);font-size:9px;letter-spacing:5px;margin-bottom:16px;}
+.loot-box.common .loot-src{color:#888;}.loot-box.uncommon .loot-src{color:#00cc66;}.loot-box.rare .loot-src{color:#0088ff;}.loot-box.epic .loot-src{color:#aa44ff;}.loot-box.legendary .loot-src{color:#ffaa00;}
+.loot-tier-badge{display:inline-block;padding:3px 16px;border:1px solid;font-family:var(--orb);font-size:9px;letter-spacing:4px;margin-bottom:20px;}
+.loot-box.common .loot-tier-badge{border-color:#888;color:#aaa;background:rgba(136,136,136,0.08);}
+.loot-box.uncommon .loot-tier-badge{border-color:#00cc66;color:#00cc66;background:rgba(0,204,102,0.08);}
+.loot-box.rare .loot-tier-badge{border-color:#0088ff;color:#44aaff;background:rgba(0,136,255,0.08);}
+.loot-box.epic .loot-tier-badge{border-color:#aa44ff;color:#cc77ff;background:rgba(170,68,255,0.08);}
+.loot-box.legendary .loot-tier-badge{border-color:#ffaa00;color:#ffcc44;background:rgba(255,170,0,0.08);}
+.loot-icon-wrap{width:80px;height:80px;border:2px solid;border-radius:2px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:36px;}
+.loot-box.common .loot-icon-wrap{border-color:#888;}.loot-box.uncommon .loot-icon-wrap{border-color:#00cc66;}.loot-box.rare .loot-icon-wrap{border-color:#0088ff;}.loot-box.epic .loot-icon-wrap{border-color:#aa44ff;}.loot-box.legendary .loot-icon-wrap{border-color:#ffaa00;}
+.loot-name{font-family:var(--orb);font-size:22px;font-weight:700;color:#fff;letter-spacing:3px;margin-bottom:8px;}
+.loot-flavor{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:1px;margin-bottom:16px;font-style:italic;}
+.loot-reward-label{font-family:var(--orb);font-size:9px;letter-spacing:4px;color:var(--text3);margin-bottom:8px;}
+.loot-reward{font-family:var(--raj);font-size:16px;font-weight:600;color:var(--green);letter-spacing:1px;margin-bottom:28px;}
+.loot-btn{padding:10px 36px;border:1px solid;background:transparent;font-family:var(--orb);font-size:10px;letter-spacing:3px;cursor:pointer;transition:all 0.2s;}
+.loot-box.common .loot-btn{border-color:#888;color:#aaa;}.loot-box.uncommon .loot-btn{border-color:#00cc66;color:#00cc66;}
+.loot-box.rare .loot-btn{border-color:#0088ff;color:#44aaff;}.loot-box.epic .loot-btn{border-color:#aa44ff;color:#cc77ff;}
+.loot-box.legendary .loot-btn{border-color:#ffaa00;color:#ffcc44;}
+
+/* Inventory */
+.inv-toggle{display:flex;align-items:center;gap:12px;cursor:pointer;padding:14px 0;font-family:var(--orb);font-size:11px;font-weight:600;letter-spacing:4px;color:var(--amber);user-select:none;border-top:1px solid rgba(255,170,0,0.2);margin-top:8px;}
+.inv-toggle-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,170,0,0.3),transparent);}
+.inv-toggle-arrow{font-size:10px;transition:transform 0.2s;color:var(--amber);}
+.inv-toggle-arrow.open{transform:rotate(180deg);}
+.inv-panel{display:none;margin-top:4px;margin-bottom:16px;}
+.inv-panel.open{display:block;}
+.inv-empty{font-size:11px;color:var(--text3);letter-spacing:2px;padding:20px;text-align:center;border:1px solid rgba(255,170,0,0.1);background:rgba(20,12,0,0.5);}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.inv-item{border:1px solid;background:var(--inner);padding:14px 16px;position:relative;overflow:hidden;}
+.inv-item::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.inv-item.common{border-color:rgba(136,136,136,0.3);}.inv-item.common::before{background:linear-gradient(90deg,transparent,#888,transparent);}
+.inv-item.uncommon{border-color:rgba(0,204,102,0.3);}.inv-item.uncommon::before{background:linear-gradient(90deg,transparent,#00cc66,transparent);}
+.inv-item.rare{border-color:rgba(0,136,255,0.3);}.inv-item.rare::before{background:linear-gradient(90deg,transparent,#0088ff,transparent);}
+.inv-item.epic{border-color:rgba(170,68,255,0.3);}.inv-item.epic::before{background:linear-gradient(90deg,transparent,#aa44ff,transparent);}
+.inv-item.legendary{border-color:rgba(255,170,0,0.3);}.inv-item.legendary::before{background:linear-gradient(90deg,transparent,#ffaa00,transparent);}
+.inv-item-icon{font-size:22px;margin-bottom:6px;}
+.inv-item-name{font-family:var(--orb);font-size:11px;font-weight:600;color:#fff;letter-spacing:1px;margin-bottom:3px;}
+.inv-item-tier{font-size:9px;letter-spacing:3px;}
+.inv-item.common .inv-item-tier{color:#888;}.inv-item.uncommon .inv-item-tier{color:#00cc66;}
+.inv-item.rare .inv-item-tier{color:#44aaff;}.inv-item.epic .inv-item-tier{color:#cc77ff;}
+.inv-item.legendary .inv-item-tier{color:#ffcc44;}
+.inv-item-reward{font-size:10px;color:var(--green);margin-top:6px;letter-spacing:0.5px;}
+.inv-item-qty{position:absolute;top:8px;right:10px;font-family:var(--orb);font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);}
+.inv-use-btn{margin-top:10px;width:100%;padding:5px 0;border:1px solid;background:transparent;font-family:var(--orb);font-size:9px;letter-spacing:3px;cursor:pointer;transition:background 0.15s;}
+.inv-item.common .inv-use-btn{border-color:rgba(136,136,136,0.4);color:#aaa;}
+.inv-item.uncommon .inv-use-btn{border-color:rgba(0,204,102,0.4);color:#00cc66;}
+.inv-item.rare .inv-use-btn{border-color:rgba(0,136,255,0.4);color:#44aaff;}
+.inv-item.epic .inv-use-btn{border-color:rgba(170,68,255,0.4);color:#cc77ff;}
+.inv-item.legendary .inv-use-btn{border-color:rgba(255,170,0,0.4);color:#ffcc44;}
+.inv-item.consumed{opacity:0.35;pointer-events:none;}
+.inv-item.consumed .inv-item-name{text-decoration:line-through;}
+.inv-consumed-label{font-family:var(--orb);font-size:9px;letter-spacing:3px;color:var(--text3);margin-top:8px;text-align:center;}
+.inv-proof-log{font-size:9px;color:var(--text3);margin-top:6px;letter-spacing:0.5px;border-top:1px solid rgba(255,255,255,0.05);padding-top:6px;}
+.inv-proof-entry{margin-bottom:3px;color:var(--text2);}
+.inv-blocked{font-family:var(--orb);font-size:9px;color:var(--red);letter-spacing:2px;margin-top:8px;text-align:center;opacity:0.7;}
+
+/* Proof modal */
+.proof-modal{position:fixed;inset:0;background:rgba(0,5,12,0.95);display:flex;align-items:center;justify-content:center;z-index:1001;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.proof-modal.show{opacity:1;pointer-events:all;}
+.proof-box{position:relative;max-width:480px;width:92%;border:1px solid var(--blue);background:var(--panel);padding:36px 40px;}
+.proof-box::before{content:'';position:absolute;inset:5px;border:1px solid rgba(0,170,255,0.12);pointer-events:none;}
+.proof-title{font-family:var(--orb);font-size:10px;letter-spacing:5px;color:var(--blue-bright);margin-bottom:6px;}
+.proof-item-name{font-family:var(--orb);font-size:20px;font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px;}
+.proof-reward{font-size:11px;color:var(--green);letter-spacing:1px;margin-bottom:20px;}
+.proof-label{font-family:var(--orb);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:8px;}
+.proof-input{width:100%;background:rgba(0,20,50,0.8);border:1px solid var(--blue-line);color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 14px;outline:none;resize:none;letter-spacing:0.5px;margin-bottom:16px;}
+.proof-input::placeholder{color:var(--text3);}
+.proof-input:focus{border-color:var(--blue);}
+.proof-btn-row{display:flex;gap:10px;}
+.proof-confirm{flex:1;padding:10px;border:1px solid var(--blue);background:var(--blue-glow);color:var(--blue-bright);font-family:var(--orb);font-size:10px;letter-spacing:3px;cursor:pointer;transition:background 0.15s;}
+.proof-confirm:hover{background:rgba(0,170,255,0.2);}
+.proof-cancel{padding:10px 20px;border:1px solid var(--blue-line);background:transparent;color:var(--text3);font-family:var(--orb);font-size:10px;letter-spacing:2px;cursor:pointer;}
+
+/* Gate */
+.gate-wrap{margin-top:8px;}
+.gate-header{display:flex;align-items:center;gap:12px;cursor:pointer;padding:16px 0;font-family:var(--orb);font-size:11px;font-weight:600;letter-spacing:4px;user-select:none;border-top:1px solid rgba(0,255,170,0.2);}
+.gate-header.inactive{border-top-color:rgba(100,100,120,0.2);color:var(--text3);}
+.gate-header.active{color:var(--green);}
+.gate-header.gate-open{color:#fff;animation:gate-pulse 2s ease-in-out infinite;}
+.gate-header.cleared{color:var(--amber);}
+.gate-header.broken{color:var(--red);}
+@keyframes gate-pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.gate-hdr-line{flex:1;height:1px;}
+.gate-header.inactive .gate-hdr-line{background:linear-gradient(90deg,rgba(100,100,120,0.2),transparent);}
+.gate-header.active .gate-hdr-line,.gate-header.gate-open .gate-hdr-line{background:linear-gradient(90deg,rgba(0,255,170,0.3),transparent);}
+.gate-header.cleared .gate-hdr-line{background:linear-gradient(90deg,rgba(255,170,0,0.4),transparent);}
+.gate-header.broken .gate-hdr-line{background:linear-gradient(90deg,rgba(255,51,85,0.4),transparent);}
+.gate-chip{font-family:var(--mono);font-size:9px;padding:2px 10px;border:1px solid;letter-spacing:2px;}
+.gate-panel{display:none;margin-bottom:16px;}
+.gate-panel.open{display:block;}
+.gate-card{border:2px solid var(--green);background:rgba(0,20,10,0.9);padding:24px 28px;position:relative;overflow:hidden;}
+.gate-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.gate-card.cleared{border-color:var(--amber);}.gate-card.cleared::before{background:linear-gradient(90deg,transparent,var(--amber),transparent);}
+.gate-card.broken{border-color:var(--red);}.gate-card.broken::before{background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.gate-card.inactive-card{border-color:rgba(100,100,120,0.3);background:rgba(5,5,15,0.6);}
+.gate-card.inactive-card::before{background:linear-gradient(90deg,transparent,rgba(100,100,120,0.3),transparent);}
+.gate-rank-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.gate-rank-icon{width:56px;height:56px;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--orb);font-size:20px;font-weight:900;color:var(--green);flex-shrink:0;}
+.gate-card.cleared .gate-rank-icon{border-color:var(--amber);color:var(--amber);}
+.gate-card.broken .gate-rank-icon{border-color:var(--red);color:var(--red);}
+.gate-title{font-family:var(--orb);font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px;}
+.gate-subtitle{font-size:10px;color:var(--text2);letter-spacing:2px;}
+.gate-status-badge{margin-left:auto;padding:4px 14px;border:1px solid;font-family:var(--orb);font-size:9px;letter-spacing:3px;}
+.status-open{border-color:var(--green);color:var(--green);background:rgba(0,255,170,0.08);}
+.status-cleared{border-color:var(--amber);color:var(--amber);background:rgba(255,170,0,0.08);}
+.status-broken{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.08);}
+.status-waiting{border-color:rgba(100,100,120,0.4);color:var(--text3);}
+.gate-rooms{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.gate-room{border:1px solid rgba(0,255,170,0.2);background:rgba(0,15,8,0.7);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color 0.2s,background 0.2s;user-select:none;position:relative;overflow:hidden;}
+.gate-room::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--green);opacity:0;transition:opacity 0.2s;}
+.gate-room:hover{border-color:rgba(0,255,170,0.5);background:rgba(0,255,170,0.05);}
+.gate-room:hover::before{opacity:1;}
+.gate-room.room-done{opacity:0.45;border-color:rgba(0,255,170,0.15);}
+.gate-room.room-done::before{opacity:1;}
+.gate-room.locked{opacity:0.3;cursor:not-allowed;}
+.gate-room.locked:hover{border-color:rgba(0,255,170,0.2);background:rgba(0,15,8,0.7);}
+.gate-room.locked:hover::before{opacity:0;}
+.room-num{width:28px;height:28px;border:1px solid rgba(0,255,170,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--orb);font-size:11px;color:var(--green);}
+.gate-room.room-done .room-num{border-color:var(--green);color:var(--green);}
+.room-name{font-family:var(--raj);font-size:16px;font-weight:600;color:#aaeedd;letter-spacing:1px;flex:1;}
+.room-sub{font-size:10px;color:#2a6644;margin-top:3px;}
+.room-xp{font-family:var(--orb);font-size:13px;font-weight:700;color:var(--green);white-space:nowrap;}
+.gate-boss-row{border:2px solid rgba(255,51,85,0.4);background:rgba(30,0,8,0.9);padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color 0.2s;user-select:none;position:relative;overflow:hidden;margin-bottom:20px;}
+.gate-boss-row::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.gate-boss-row.boss-locked{opacity:0.3;cursor:not-allowed;}
+.gate-boss-row:not(.boss-locked):hover{border-color:rgba(255,51,85,0.7);background:rgba(255,51,85,0.06);}
+.gate-boss-row.boss-done{opacity:0.4;border-color:rgba(255,170,0,0.3);}
+.boss-skull{width:40px;height:40px;border:2px solid rgba(255,51,85,0.5);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:var(--red);}
+.boss-name{font-family:var(--raj);font-size:17px;font-weight:600;color:#ffaaaa;letter-spacing:1px;}
+.boss-sub-text{font-size:10px;color:#aa5566;margin-top:3px;}
+.boss-xp{font-family:var(--orb);font-size:13px;font-weight:700;color:var(--red);margin-left:auto;white-space:nowrap;}
+.gate-note{font-size:10px;color:var(--text3);letter-spacing:2px;text-align:center;padding:12px;border:1px solid rgba(100,100,120,0.15);background:rgba(5,5,15,0.5);}
+.gate-sunday-note{font-size:10px;color:var(--text3);letter-spacing:2px;text-align:center;padding:16px;border:1px solid rgba(0,255,170,0.1);}
+
+/* Red Gate */
+.red-gate-card{border:2px solid var(--red);background:rgba(30,0,5,0.95);padding:24px 28px;position:relative;overflow:hidden;}
+.red-gate-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--red),transparent);}
+.red-gate-title-row{display:flex;align-items:center;gap:16px;margin-bottom:8px;}
+.red-gate-icon{width:56px;height:56px;border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:var(--red);animation:gate-pulse 1s ease-in-out infinite;}
+.red-gate-name{font-family:var(--orb);font-size:20px;font-weight:900;color:#fff;letter-spacing:2px;text-shadow:0 0 20px rgba(255,51,85,0.6);}
+.red-gate-flavor{font-family:var(--mono);font-size:11px;color:#aa5566;letter-spacing:1px;margin-bottom:20px;font-style:italic;}
+.red-gate-deadline{display:flex;align-items:center;gap:10px;font-family:var(--orb);font-size:11px;color:var(--red);letter-spacing:3px;margin-bottom:20px;padding:10px 16px;border:1px solid rgba(255,51,85,0.3);background:rgba(255,51,85,0.05);}
+.red-gate-room{border:1px solid rgba(255,51,85,0.3);background:rgba(20,0,5,0.8);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.2s,background 0.2s;user-select:none;margin-bottom:8px;}
+.red-gate-room::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);opacity:0;transition:opacity 0.2s;}
+.red-gate-room:hover{border-color:rgba(255,51,85,0.6);background:rgba(255,51,85,0.06);}
+.red-gate-room:hover::before{opacity:1;}
+.red-gate-room.done{opacity:0.4;border-color:rgba(255,170,0,0.2);}
+.red-gate-room.done::before{background:var(--amber);opacity:1;}
+.red-gate-room.rg-locked{opacity:0.25;cursor:not-allowed;}
+.red-gate-room.rg-locked:hover{border-color:rgba(255,51,85,0.3);background:rgba(20,0,5,0.8);}
+.red-gate-room.rg-locked:hover::before{opacity:0;}
+.rg-room-num{width:28px;height:28px;border:1px solid rgba(255,51,85,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--orb);font-size:11px;color:var(--red);}
+.red-gate-room.done .rg-room-num{border-color:var(--amber);color:var(--amber);}
+.rg-room-name{font-family:var(--raj);font-size:16px;font-weight:600;color:#ffaaaa;letter-spacing:1px;flex:1;}
+.rg-room-sub{font-size:10px;color:#aa5566;margin-top:3px;}
+.rg-room-xp{font-family:var(--orb);font-size:13px;font-weight:700;color:var(--red);white-space:nowrap;}
+.red-gate-penalty{padding:12px 16px;border:1px solid rgba(255,51,85,0.3);background:rgba(255,51,85,0.05);font-size:10px;color:#882233;letter-spacing:2px;text-align:center;margin-top:16px;}
+.rg-cleared-note{font-family:var(--orb);font-size:10px;color:var(--amber);letter-spacing:3px;text-align:center;padding:14px;border:1px solid rgba(255,170,0,0.2);}
+.rg-failed-note{font-family:var(--orb);font-size:10px;color:var(--red);letter-spacing:3px;text-align:center;padding:14px;border:1px solid rgba(255,51,85,0.2);}
+
+@media(max-width:640px){
+  .hdr-name{font-size:30px;letter-spacing:4px;}
+  .stat-val{font-size:34px;}
+  .frame-inner{padding:24px 20px;}
+  .ov-box{padding:36px 28px;}
+  .ov-rank{font-size:22px;}
+  .btn-row{flex-wrap:wrap;}
+  .ftr{flex-direction:column;gap:20px;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─── CONSTANTS ──────────────────────────────────────────────────────────────
+const KEY = 'drew_system_v1';
+const DATE_KEY = 'drew_system_lastSeen';
+
+const DAILY_Q = [
+  {id:'plank',    name:'Daily Plank',       sub:'Hold for 1 min',                      xp:15, stat:'str', v:1},
+  {id:'bible',    name:'Read the Bible',    sub:'Daily verse or chapter',              xp:20, stat:'vit', v:2},
+  {id:'book',     name:'Read a Book',       sub:'Psychology of Money / Harry Potter…', xp:20, stat:'int', v:2},
+  {id:'dumbbell', name:'Dumbbell Training', sub:'Follow training plan',                xp:20, stat:'str', v:2},
+];
+const BONUS_Q = [
+  {id:'run',   name:'Running',                  sub:'Follow training plan distance',    xp:25, stat:'agi', v:2},
+  {id:'draw',  name:'Freehand Sketching',       sub:'Abstract drawing session',         xp:20, stat:'agi', v:2},
+  {id:'ai',    name:'AI Innovation Brainstorm', sub:'Ideate a new concept or problem',  xp:25, stat:'int', v:3},
+  {id:'build', name:'Build with Claude / Code', sub:'Work on S2S agent or any project', xp:30, stat:'int', v:3},
+];
+const VIOLATIONS = [
+  {id:'vself', name:'Self-Pleasure',              sub:'Vitality and willpower drained',            xp:-50, stat:'vit', v:-3, ico:'ti-alert-octagon'},
+  {id:'vskip', name:'Deliberately Skipped',       sub:'You chose comfort over growth',             xp:-30, stat:'str', v:-2, ico:'ti-mood-sad'},
+  {id:'vjunk', name:'Ate Junk Food',              sub:'Body is the vessel — treat it well',        xp:-20, stat:'vit', v:-1, ico:'ti-pizza'},
+  {id:'vdoom', name:'Mindless Doomscrolling 1h+', sub:'Wasted time that could be growth',          xp:-25, stat:'int', v:-2, ico:'ti-device-mobile'},
+  {id:'vneg',  name:'Negative Self-Talk Spiral',  sub:'The Shadow Monarch does not doubt himself', xp:-15, stat:'vit', v:-1, ico:'ti-brain'},
+];
+const RANKS = [
+  {label:'E-RANK HUNTER',minL:1},{label:'D-RANK HUNTER',minL:5},{label:'C-RANK HUNTER',minL:10},
+  {label:'B-RANK HUNTER',minL:20},{label:'A-RANK HUNTER',minL:35},{label:'S-RANK HUNTER',minL:50},
+  {label:'NATIONAL-LEVEL HUNTER',minL:75},{label:'SHADOW MONARCH',minL:100},
+];
+const CHALLENGE_POOL = [
+  {id:'ch1',  name:'100 Push-Ups',           sub:'Complete 100 push-ups total — break into sets', xp:60, stat:'str', v:4},
+  {id:'ch2',  name:'Cold Shower',             sub:'No warm water — full cold shower',              xp:40, stat:'vit', v:3},
+  {id:'ch3',  name:'No Phone Before Noon',    sub:'Zero screen time until 12PM',                  xp:50, stat:'int', v:3},
+  {id:'ch4',  name:'Read 30 Pages',           sub:'Any book — 30 pages in one sitting',           xp:55, stat:'int', v:4},
+  {id:'ch5',  name:'Fast Until 2PM',          sub:'No food until 14:00 — discipline over hunger', xp:50, stat:'vit', v:3},
+  {id:'ch6',  name:'Draw for 1 Hour',         sub:'Uninterrupted sketching session',              xp:50, stat:'agi', v:3},
+  {id:'ch7',  name:'Write 500 Words',         sub:'Journal, idea dump, or story',                 xp:55, stat:'int', v:4},
+  {id:'ch8',  name:'10,000 Steps',            sub:'Walk at least 10,000 steps today',             xp:60, stat:'agi', v:4},
+  {id:'ch9',  name:'No Social Media',         sub:'Zero social media for the entire day',         xp:55, stat:'int', v:3},
+  {id:'ch10', name:'Three Bible Chapters',    sub:'Read three full chapters back to back',        xp:50, stat:'vit', v:3},
+  {id:'ch11', name:'Plan Next 7 Days',        sub:'Write a full week plan with goals',            xp:55, stat:'int', v:3},
+  {id:'ch12', name:'50 Burpees',              sub:'Complete 50 burpees — rest between sets',      xp:65, stat:'str', v:5},
+  {id:'ch13', name:'Wall Sit 5 Minutes',      sub:'Back flat on wall — hold for 5 total minutes', xp:45, stat:'str', v:3},
+  {id:'ch14', name:'150 Jumping Jacks',       sub:'Full range — arms and legs every rep',         xp:45, stat:'agi', v:3},
+  {id:'ch15', name:'Superman Hold',           sub:'30 reps — lift arms and legs off floor',       xp:40, stat:'str', v:3},
+  {id:'ch16', name:'Mountain Climbers 5 Min', sub:'Continuous for 5 minutes — track your pace',  xp:55, stat:'agi', v:4},
+  {id:'ch17', name:'Diamond Push-Ups 50',     sub:'Hands close together — 50 reps total',        xp:60, stat:'str', v:4},
+  {id:'ch18', name:'100 Squats',              sub:'Full depth — no cheating the range',           xp:55, stat:'str', v:4},
+  {id:'ch19', name:'Hollow Body Hold',        sub:'3 sets of 30 seconds — core tight',           xp:45, stat:'vit', v:3},
+  {id:'ch20', name:'Bear Crawl 10 Minutes',   sub:'Crawl back and forth in your room or hallway', xp:55, stat:'str', v:4},
+  {id:'ch21', name:'Pike Push-Ups 40',        sub:'Hips high, head toward floor — 40 reps',      xp:55, stat:'str', v:4},
+  {id:'ch22', name:'Jump Squats 60',          sub:'Explode up each rep — land soft',              xp:60, stat:'agi', v:4},
+  {id:'ch23', name:'Leg Raises 50',           sub:'Flat on floor — legs straight, controlled',    xp:45, stat:'vit', v:3},
+  {id:'ch24', name:'High Knees 5 Minutes',    sub:'Drive knees above waist — keep pace up',      xp:50, stat:'agi', v:3},
+  {id:'ch25', name:'Tricep Dips 50',          sub:'Use a chair or bed edge — full extension',     xp:50, stat:'str', v:3},
+  {id:'ch26', name:'Inchworm 10 Reps',        sub:'Walk hands out to plank, back in — slow',     xp:40, stat:'str', v:3},
+  {id:'ch27', name:'Flutter Kicks 3 Minutes', sub:'On your back — small fast kicks, legs low',   xp:45, stat:'vit', v:3},
+  {id:'ch28', name:'Calf Raises 100',         sub:'Use a step or flat floor — full range',        xp:40, stat:'agi', v:2},
+  {id:'ch29', name:'Plank Shoulder Taps 40',  sub:'In plank — tap each shoulder 20 times each',  xp:50, stat:'str', v:3},
+  {id:'ch30', name:'Full Stretch Routine',    sub:'20 minutes — every major muscle group',        xp:40, stat:'vit', v:3},
+];
+const BOSS_POOL = [
+  {id:'b1', name:'Iron Body Protocol',  sub:'Complete all physical quests 3 days in a row',    xp:150, stat:'str', v:8,  days:3},
+  {id:'b2', name:"Scholar's Gauntlet",  sub:'Read a book AND brainstorm every day for 3 days', xp:150, stat:'int', v:8,  days:3},
+  {id:'b3', name:"Monk's Discipline",   sub:'Zero violations for 5 consecutive days',          xp:200, stat:'vit', v:10, days:5},
+  {id:'b4', name:"Shadow's Resolve",    sub:'Complete ALL daily obligations 4 days straight',  xp:180, stat:'vit', v:9,  days:4},
+  {id:'b5', name:"The Builder's Trial", sub:'Build with Claude every day for 3 days',          xp:160, stat:'int', v:8,  days:3},
+];
+const SHADOW_POOL = [
+  {id:'sh1', name:'???', sub:'The System is watching…', reveal:'First Step',  rdesc:'Completed your very first quest',              xp:30,  trigger:'firstQuest'},
+  {id:'sh2', name:'???', sub:'The System is watching…', reveal:'Iron Will',   rdesc:'Completed all 4 daily obligations in one day',  xp:50,  trigger:'allDaily'},
+  {id:'sh3', name:'???', sub:'The System is watching…', reveal:'Pure Soul',   rdesc:'Ended a day with zero violations',              xp:60,  trigger:'cleanDay'},
+  {id:'sh4', name:'???', sub:'The System is watching…', reveal:'Bookworm',    rdesc:'Completed the book quest 3 times',              xp:70,  trigger:'book3'},
+  {id:'sh5', name:'???', sub:'The System is watching…', reveal:'Devotion',    rdesc:'Read the Bible 5 times',                       xp:80,  trigger:'bible5'},
+];
+const LOOT_TABLE = {
+  common:[
+    {id:'l1', name:'HP Potion',       icon:'⚗️', flavor:'"A basic recovery elixir. Smells faintly of herbs."',         reward:'Guilt-free 20-min nap anytime today',      tier:'common'},
+    {id:'l2', name:"Hunter's Bread",  icon:'🍞', flavor:'"Standard field ration. Tasteless but filling."',             reward:'Skip doing the dishes — just this once',    tier:'common'},
+    {id:'l3', name:'Mana Shard',      icon:'💎', flavor:'"A tiny fragment of crystallized mana. Faintly warm."',       reward:'30 mins of YouTube, zero guilt',            tier:'common'},
+    {id:'l4', name:'Iron Ore',        icon:'🪨', flavor:'"Raw material. The foundation of all great equipment."',     reward:'Skip one chore of your choice today',        tier:'common'},
+  ],
+  uncommon:[
+    {id:'l5', name:'Stamina Elixir',  icon:'🧪', flavor:'"Doubles physical output for a short duration."',            reward:'1 hour of gaming or anime, no guilt',        tier:'uncommon'},
+    {id:'l6', name:"Hunter's Ration", icon:'🥩', flavor:'"High-calorie field meal reserved for serious hunters."',    reward:'Eat your favorite home-cooked meal tonight', tier:'uncommon'},
+    {id:'l7', name:'Focus Crystal',   icon:'🔮', flavor:'"Sharpens the mind. Hunters use it before raids."',          reward:'Full movie night — your pick, lights off',   tier:'uncommon'},
+    {id:'l8', name:'Swift Boots',     icon:'👟', flavor:'"Enchanted footwear. +2 AGI while equipped."',               reward:'Sleep 1 hour later than usual tonight',      tier:'uncommon'},
+  ],
+  rare:[
+    {id:'l9',  name:'Shadow Cloak',      icon:'🌑', flavor:'"Woven from the essence of shadow. Near-invisible."',      reward:'Full rest day — obligations suspended',      tier:'rare'},
+    {id:'l10', name:"Healer's Tome",     icon:'📖', flavor:'"A forbidden tome of recovery magic."',                    reward:'Sleep in tomorrow — no alarm allowed',       tier:'rare'},
+    {id:'l11', name:'Phantom Blade',     icon:'🗡️', flavor:'"A blade that cuts through any defense."',                reward:'Binge a show guilt-free all evening',        tier:'rare'},
+    {id:'l12', name:"Berserker's Rune",  icon:'⚔️', flavor:'"Ancient power carved into stone. Raw and untamed."',     reward:'Skip all bonus quests for 2 days',           tier:'rare'},
+  ],
+  epic:[
+    {id:'l13', name:"Demon King's Elixir", icon:'🔥', flavor:'"Said to be brewed from the blood of a Demon King."',    reward:'Cheat day — eat whatever is at home, no guilt', tier:'epic'},
+    {id:'l14', name:"Ruler's Authority",   icon:'👑', flavor:'"A skill used only by those who stand above all."',      reward:'Pick one daily obligation to skip this week',   tier:'epic'},
+    {id:'l15', name:"Dragon's Heart",      icon:'🐉', flavor:'"The crystallized will of a dragon. Immense power."',    reward:'Free afternoon — no plans, no screen limits',   tier:'epic'},
+  ],
+  legendary:[
+    {id:'l16', name:"Architect's Gift",      icon:'🌌', flavor:'"A reward from the one who built the System itself."',  reward:'One full day — no quests, no rules, just rest',       tier:'legendary'},
+    {id:'l17', name:"Shadow Monarch's Seal", icon:'⬛', flavor:'"The mark of the strongest. None dare challenge it."',  reward:'Declare today a personal holiday — you earned it',    tier:'legendary'},
+  ],
+};
+const TIER_WEIGHTS = {common:55, uncommon:25, rare:13, epic:5, legendary:2};
+const TIER_ORDER   = ['common','uncommon','rare','epic','legendary'];
+
+const GATE_RANKS = {
+  'E-RANK HUNTER':        {rank:'E', loot:'uncommon', rooms:[
+    {name:'Morning Run',      sub:'Run or brisk walk for 1 km',          xp:30, stat:'agi', v:2},
+    {name:'Bodyweight Drill', sub:'20 push-ups + 20 squats',             xp:25, stat:'str', v:2},
+    {name:'Iron Plank Hold',  sub:'Hold a plank for 90 seconds',         xp:20, stat:'str', v:1},
+  ], boss:{name:'Goblin Lord',    sub:'Defeat him: 10-min light jog',       xp:60,  stat:'agi', v:3}},
+  'D-RANK HUNTER':        {rank:'D', loot:'uncommon', rooms:[
+    {name:'Distance Run',     sub:'Run 2 km without stopping',           xp:40, stat:'agi', v:3},
+    {name:'Push-Up Assault',  sub:'Complete 40 push-ups',                xp:35, stat:'str', v:3},
+    {name:'Core Destroyer',   sub:'30 sit-ups + 2 min plank',            xp:30, stat:'str', v:2},
+  ], boss:{name:'Orc Warchief',   sub:'Defeat him: 5-min sprint intervals', xp:90,  stat:'str', v:4}},
+  'C-RANK HUNTER':        {rank:'C', loot:'rare', rooms:[
+    {name:'3km Trail Run',    sub:'Run 3 km — track your time',          xp:55, stat:'agi', v:4},
+    {name:'Strength Circuit', sub:'50 push-ups + 30 squats + 20 lunges', xp:45, stat:'str', v:3},
+    {name:'Endurance Hold',   sub:'3 min plank — no breaks',             xp:40, stat:'vit', v:3},
+  ], boss:{name:'Stone Giant',    sub:'Defeat him: 800m full sprint',       xp:120, stat:'agi', v:5}},
+  'B-RANK HUNTER':        {rank:'B', loot:'rare', rooms:[
+    {name:'4km Run',          sub:'Run 4 km, log pace',                  xp:65, stat:'agi', v:4},
+    {name:'Warrior Circuit',  sub:'100 push-ups total (sets allowed)',   xp:60, stat:'str', v:4},
+    {name:'Shadow Stamina',   sub:'4 min plank + 50 sit-ups',            xp:55, stat:'vit', v:4},
+  ], boss:{name:'Demon Soldier',  sub:'Defeat him: 1km timed run',          xp:150, stat:'str', v:6}},
+  'A-RANK HUNTER':        {rank:'A', loot:'epic', rooms:[
+    {name:'5km Run',          sub:'Run 5 km — beat your last time',      xp:80, stat:'agi', v:5},
+    {name:'Iron Body Protocol',sub:'100 push-ups + 100 squats',          xp:75, stat:'str', v:5},
+    {name:'Monk Endurance',   sub:'5 min plank + 1 min rest + repeat',   xp:70, stat:'vit', v:5},
+  ], boss:{name:'Demon General',  sub:'Defeat him: 2km sprint, no walk',    xp:200, stat:'agi', v:7}},
+  'S-RANK HUNTER':        {rank:'S', loot:'epic', rooms:[
+    {name:'Full Distance Run',  sub:"Run 7 km — the Shadow Monarch's trial", xp:100, stat:'agi', v:6},
+    {name:'Absolute Strength',  sub:'Max push-ups in 10 min — log count',    xp:90,  stat:'str', v:6},
+    {name:'Unbreakable Core',   sub:'5 min plank — zero compromise',          xp:85,  stat:'vit', v:6},
+  ], boss:{name:'Demon King',     sub:'Defeat him: 3km full run under 18min', xp:280, stat:'agi', v:9}},
+  'NATIONAL-LEVEL HUNTER':{rank:'N', loot:'legendary', rooms:[
+    {name:'10km Monarch Run',   sub:'Run 10 km — track every split',          xp:120, stat:'agi', v:7},
+    {name:'Sovereign Circuit',  sub:'150 push-ups + 100 squats + 50 lunges',  xp:110, stat:'str', v:7},
+    {name:'Iron Throne Hold',   sub:'7 min plank — sit on your throne',       xp:100, stat:'vit', v:7},
+  ], boss:{name:'Antares',        sub:'Defeat him: 5km run under 25 min',      xp:350, stat:'agi', v:10}},
+  'SHADOW MONARCH':       {rank:'∞', loot:'legendary', rooms:[
+    {name:"Shadow's Distance",  sub:'Run 10 km — honor the Monarch',           xp:150, stat:'agi', v:8},
+    {name:'Army of Shadows',    sub:'Max push-ups + 10 min bodyweight',        xp:140, stat:'str', v:8},
+    {name:'Eternal Endurance',  sub:'10 min plank — shadows never tire',       xp:130, stat:'vit', v:8},
+  ], boss:{name:'Absolute Being', sub:'Defeat him: 5km run, beat your PR',     xp:500, stat:'agi', v:12}},
+};
+const RED_GATE_POOL = [
+  {id:'rg1',name:'Goblin Ambush',icon:'👺',flavor:'"You stepped into a rift. There is no turning back."',penalty:60,loot:'uncommon',rooms:[
+    {name:'First Wave',       sub:'Complete 30 push-ups — right now',         xp:35,stat:'str',v:2},
+    {name:'Second Wave',      sub:'Hold a 2-minute plank',                    xp:35,stat:'vit',v:2},
+    {name:'Final Assault',    sub:'Do 40 squats without stopping',            xp:40,stat:'agi',v:2},
+  ],boss:{name:'Goblin Commander',sub:'5-minute non-stop jog or run in place', xp:80,stat:'agi',v:3}},
+  {id:'rg2',name:'Shadow Labyrinth',icon:'🌀',flavor:'"The walls shift. The exit is sealed. Only strength opens the way."',penalty:60,loot:'uncommon',rooms:[
+    {name:'Corridor of Pain', sub:'50 jumping jacks, full intensity',        xp:40,stat:'agi',v:2},
+    {name:'Room of Silence',  sub:'Read 10 pages of any book — right now',   xp:35,stat:'int',v:2},
+    {name:'Hall of Wills',    sub:'Write down 3 goals for this week',        xp:35,stat:'int',v:2},
+  ],boss:{name:'Labyrinth Keeper',sub:'Meditate or pray for 10 minutes',      xp:90,stat:'vit',v:3}},
+  {id:'rg3',name:"Demon's Trial",icon:'😈',flavor:'"A demon has chosen you. Prove you are worthy to survive."',penalty:70,loot:'rare',rooms:[
+    {name:'Trial of the Body',  sub:'20 push-ups + 20 lunges + 20 sit-ups',  xp:45,stat:'str',v:3},
+    {name:'Trial of the Mind',  sub:'Brainstorm one new AI idea — write it', xp:40,stat:'int',v:3},
+    {name:'Trial of the Spirit',sub:'Read one Bible verse and reflect',      xp:35,stat:'vit',v:2},
+  ],boss:{name:'Demon Inquisitor',sub:'Cold shower — no exceptions',          xp:100,stat:'vit',v:4}},
+  {id:'rg4',name:'The Red Rift',icon:'🔴',flavor:'"The gate is red. The most dangerous kind. Run — or be consumed."',penalty:75,loot:'rare',rooms:[
+    {name:'Rift Entrance',sub:'Drop and do 25 push-ups immediately',          xp:40,stat:'str',v:2},
+    {name:'Rift Depths',  sub:'Hold plank for 90 seconds',                   xp:40,stat:'vit',v:2},
+    {name:'Rift Core',    sub:'Sprint or run in place for 3 minutes',        xp:45,stat:'agi',v:3},
+  ],boss:{name:'Rift Guardian',sub:'2km run or 20-min brisk walk outside',    xp:110,stat:'agi',v:4}},
+  {id:'rg5',name:"Igris's Challenge",icon:'🏴',flavor:'"The Shadow Knight himself has descended. Only the worthy survive."',penalty:90,loot:'epic',rooms:[
+    {name:"Knight's Greeting",sub:'50 push-ups — break into sets if needed', xp:55,stat:'str',v:3},
+    {name:"Knight's Patience",sub:'Read your book for 20 minutes straight',  xp:45,stat:'int',v:3},
+    {name:"Knight's Fury",    sub:'100 squats — honor the challenge',        xp:55,stat:'agi',v:3},
+  ],boss:{name:'Igris the Bloodred',sub:'3km run — do not walk',              xp:140,stat:'str',v:5}},
+  {id:'rg6',name:'The Iron Cage',icon:'⛓️',flavor:'"The cage has closed. Your body is your only weapon."',penalty:70,loot:'rare',rooms:[
+    {name:'Chain Breaker',sub:'40 diamond push-ups — hands close together',  xp:50,stat:'str',v:3},
+    {name:'Wall of Pain', sub:'Wall sit for 3 minutes total',                xp:45,stat:'str',v:3},
+    {name:'Last Link',    sub:'60 jump squats — explode every rep',          xp:55,stat:'agi',v:3},
+  ],boss:{name:'Iron Warden',sub:'5-minute mountain climbers non-stop',       xp:120,stat:'str',v:4}},
+  {id:'rg7',name:'Cursed Hollow',icon:'💀',flavor:'"The hollow drains your will. Move — or be swallowed."',penalty:65,loot:'uncommon',rooms:[
+    {name:'Hollow Entrance',sub:'50 leg raises — slow and controlled',       xp:45,stat:'vit',v:3},
+    {name:'Cursed Corridor',sub:'3 sets of hollow body hold — 30 sec each',  xp:45,stat:'vit',v:3},
+    {name:'Final Chamber',  sub:'50 pike push-ups — hips high, head low',    xp:50,stat:'str',v:3},
+  ],boss:{name:'Hollow King',sub:'100 calf raises + 5 min flutter kicks',     xp:115,stat:'vit',v:4}},
+  {id:'rg8',name:"Beast's Den",icon:'🐺',flavor:'"You have entered the den. The beast smells weakness."',penalty:75,loot:'rare',rooms:[
+    {name:"Beast's Roar",  sub:'Bear crawl for 5 minutes in your space',    xp:50,stat:'str',v:3},
+    {name:"Beast's Claw",  sub:'40 tricep dips on chair or bed edge',       xp:45,stat:'str',v:3},
+    {name:"Beast's Charge",sub:'80 high knees — drive them above waist',    xp:50,stat:'agi',v:3},
+  ],boss:{name:'Alpha Beast',sub:'10 inchworms + 50 burpees — full set',      xp:125,stat:'agi',v:5}},
+];
+
+// ─── HELPERS ────────────────────────────────────────────────────────────────
+function xpFor(l) { return Math.round(100 * Math.pow(l, 1.3)); }
+function getRank(l) { let r = RANKS[0]; for (const x of RANKS) if (l >= x.minL) r = x; return r; }
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
+function daysBetween(a, b) { return Math.max(0, Math.floor((new Date(b) - new Date(a)) / 86400000)); }
+function seededRand(seed, max) { let x = Math.sin(seed+1)*10000; return Math.floor((x - Math.floor(x)) * max); }
+function dateSeed() { const p = todayStr().split('-'); return parseInt(p[0])*10000+parseInt(p[1])*100+parseInt(p[2]); }
+function getDailyChallenge() { return CHALLENGE_POOL[seededRand(dateSeed(), CHALLENGE_POOL.length)]; }
+function getBossForLevel(lvl) { return BOSS_POOL[Math.floor((lvl-1)/5) % BOSS_POOL.length]; }
+function isSunday() { return new Date().getDay() === 0; }
+function getWeekNum(d) {
+  const s = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  s.setUTCDate(s.getUTCDate() + 4 - (s.getUTCDay() || 7));
+  const y = new Date(Date.UTC(s.getUTCFullYear(), 0, 1));
+  return Math.ceil((((s - y) / 86400000) + 1) / 7);
+}
+function getGateKey() { const d = new Date(); return d.getFullYear() + '-W' + getWeekNum(d); }
+function getRGKey()   { const d = new Date(); return 'rg-' + d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
+
+function rollLoot(minTier) {
+  const tiers = ['common','uncommon','rare','epic','legendary'];
+  const minIdx = tiers.indexOf(minTier) || 0;
+  const pool = tiers.slice(minIdx);
+  const weights = pool.map(t => TIER_WEIGHTS[t]);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let rand = Math.random() * total;
+  let tier = pool[pool.length - 1];
+  for (let i = 0; i < pool.length; i++) { rand -= weights[i]; if (rand <= 0) { tier = pool[i]; break; } }
+  const items = LOOT_TABLE[tier];
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+const DEF = () => ({
+  xp:0, level:1, stats:{str:10,agi:10,int:10,vit:10}, done:{}, used:{}, streak:0, day:1,
+  challengeDone:false, boss:null, bossProgress:0, shadowDone:{}, questCounts:{},
+  inventory:[], questLoot:{}, gateWeek:null, gateRoomsDone:[], gateCleared:false, gateBroken:false,
+  rgKey:null, rgId:null, rgRoomsDone:[], rgCleared:false, rgFailed:false,
+});
+
+function loadState() {
+  try {
+    const r = localStorage.getItem(KEY);
+    if (r) return Object.assign(DEF(), JSON.parse(r));
+  } catch(e) {}
+  return DEF();
+}
+function saveState(s) {
+  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e) {}
+}
+
+// ─── SUBCOMPONENTS ───────────────────────────────────────────────────────────
+function Corners() {
+  return <>
+    <div className="cb tl"/><div className="cb tr"/>
+    <div className="cb bl"/><div className="cb br"/>
+  </>;
+}
+
+function Overlay({show, cls, notif, rank, sub, btnText, onClose}) {
+  return (
+    <div className={`overlay${show?' show':''}`}>
+      <div className={`ov-box${cls?' '+cls:''}`}>
+        <Corners/>
+        <div className="ov-notif">{notif}</div>
+        <div className="ov-deco">
+          <div className="ov-deco-line"/>
+          <div className="ov-diamond"/>
+          <div className="ov-deco-line"/>
+        </div>
+        <div className="ov-rank">{rank}</div>
+        <div className="ov-sub">{sub}</div>
+        <button className="ov-btn" onClick={onClose}>{btnText || 'ACKNOWLEDGE'}</button>
+      </div>
+    </div>
+  );
+}
+
+function LootOverlay({show, item, source, onClose}) {
+  if (!item) return null;
+  return (
+    <div className={`loot-overlay${show?' show':''}`}>
+      <div className={`loot-box ${item.tier}`}>
+        <Corners/>
+        <div className="loot-src">[ {source} ]</div>
+        <div className="loot-tier-badge">{item.tier.toUpperCase()}</div>
+        <div className="loot-icon-wrap">{item.icon}</div>
+        <div className="loot-name">{item.name}</div>
+        <div className="loot-flavor">{item.flavor}</div>
+        <div className="loot-reward-label">REAL-WORLD REWARD</div>
+        <div className="loot-reward">{item.reward}</div>
+        <button className="loot-btn" onClick={onClose}>COLLECT ITEM</button>
+      </div>
+    </div>
+  );
+}
+
+function ProofModal({show, item, onClose, onConfirm}) {
+  const [text, setText] = useState('');
+  const [shake, setShake] = useState(false);
+  if (!item) return null;
+  const handleConfirm = () => {
+    if (!text.trim()) { setShake(true); setTimeout(()=>setShake(false),1500); return; }
+    onConfirm(text.trim());
+    setText('');
+  };
+  return (
+    <div className={`proof-modal${show?' show':''}`}>
+      <div className="proof-box">
+        <Corners/>
+        <div className="proof-title">[ ITEM ACTIVATION ]</div>
+        <div className="proof-item-name">{item.name}</div>
+        <div className="proof-reward">◆ {item.reward}</div>
+        <div className="proof-label">WHAT DID YOU DO WITH THIS REWARD?</div>
+        <textarea
+          className="proof-input"
+          rows={3}
+          placeholder="e.g. watched Arcane for 2 hours, slept in until 9am..."
+          value={text}
+          onChange={e=>setText(e.target.value)}
+          style={shake?{borderColor:'var(--red)'}:{}}
+        />
+        <div className="proof-btn-row">
+          <button className="proof-cancel" onClick={()=>{setText('');onClose();}}>CANCEL</button>
+          <button className="proof-confirm" onClick={handleConfirm}>CONFIRM USE</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuestItem({q, done, cls, xpCls, onClick}) {
+  return (
+    <div className={`q-item${cls?' '+cls:''}${done?' done':''}`} onClick={onClick}>
+      <div className="q-check">{done && <i className="ti ti-check"/>}</div>
+      <div style={{flex:1}}>
+        <div className="q-name">{q.name}</div>
+        {q.sub && <div className="q-sub">{q.sub}</div>}
+      </div>
+      <div className={`q-xp ${xpCls}`}>+{q.xp} XP</div>
+    </div>
+  );
+}
+
+function GateSection({state, isSundayNow, onCompleteRoom, onDefeatBoss}) {
+  const [open, setOpen] = useState(false);
+  const rankLabel = getRank(state.level).label;
+  const gate      = GATE_RANKS[rankLabel] || GATE_RANKS['E-RANK HUNTER'];
+  const cleared   = state.gateWeek === getGateKey() && state.gateCleared;
+  const broken    = state.gateWeek === getGateKey() && state.gateBroken;
+  const active    = isSundayNow && !cleared && !broken;
+  const roomsDone = state.gateRoomsDone || [];
+  const allRooms  = roomsDone.length >= gate.rooms.length;
+
+  let headerCls = 'inactive', chipText = 'OPENS SUNDAY';
+  let chipStyle = {borderColor:'rgba(100,100,120,0.3)', color:'var(--text3)'};
+  if (cleared)      { headerCls='cleared'; chipText='CLEARED';    chipStyle={borderColor:'rgba(255,170,0,0.5)',color:'var(--amber)'}; }
+  else if (broken)  { headerCls='broken';  chipText='BROKEN';     chipStyle={borderColor:'rgba(255,51,85,0.5)',color:'var(--red)'}; }
+  else if (active)  { headerCls='gate-open'; chipText='GATE OPEN'; chipStyle={borderColor:'rgba(0,255,170,0.5)',color:'var(--green)'}; }
+
+  return (
+    <div className="gate-wrap">
+      <div className={`gate-header ${headerCls}`} onClick={()=>setOpen(o=>!o)}>
+        <i className="ti ti-door-enter" style={{fontSize:16}}/>
+        DIMENSIONAL GATE
+        <span className="gate-chip" style={chipStyle}>{chipText}</span>
+        <div className="gate-hdr-line"/>
+        <i className={`ti ti-chevron-down inv-toggle-arrow${open?' open':''}`}/>
+      </div>
+      <div className={`gate-panel${open?' open':''}`}>
+        {!isSundayNow && !cleared && !broken ? (
+          <div className="gate-card inactive-card">
+            <div className="gate-sunday-note">◆ &nbsp; THE GATE OPENS ON SUNDAY &nbsp; ◆<br/><br/>Prepare yourself, Hunter. The dungeon waits.</div>
+          </div>
+        ) : (
+          <div className={`gate-card${cleared?' cleared':broken?' broken':''}`}>
+            <div className="gate-rank-row">
+              <div className="gate-rank-icon">{gate.rank}</div>
+              <div>
+                <div className="gate-title">{rankLabel.replace(' HUNTER','')} GATE</div>
+                <div className="gate-subtitle">DIMENSIONAL DUNGEON  ◆  SUNDAY RAID</div>
+              </div>
+              <div className={`gate-status-badge ${cleared?'status-cleared':broken?'status-broken':active?'status-open':'status-waiting'}`}>
+                {cleared?'CLEARED':broken?'BROKEN':active?'GATE OPEN':'WAITING'}
+              </div>
+            </div>
+            <div className="gate-rooms">
+              {gate.rooms.map((room,i) => {
+                const done   = roomsDone.includes(i);
+                const locked = !active || (!done && i > 0 && !roomsDone.includes(i-1));
+                return (
+                  <div key={i} className={`gate-room${done?' room-done':''}${locked&&!done?' locked':''}`}
+                    onClick={()=>!locked&&!done&&onCompleteRoom(i)}>
+                    <div className="room-num">{done?<i className="ti ti-check" style={{fontSize:12}}/>:(i+1)}</div>
+                    <div style={{flex:1}}><div className="room-name">{room.name}</div><div className="room-sub">{room.sub}</div></div>
+                    <div className="room-xp">+{room.xp} XP</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className={`gate-boss-row${!active||!allRooms?' boss-locked':''}${cleared?' boss-done':''}`}
+              onClick={()=>active&&allRooms&&!cleared&&onDefeatBoss()}>
+              <div className="boss-skull"><i className="ti ti-skull" style={{fontSize:18}}/></div>
+              <div style={{flex:1}}><div className="boss-name">{gate.boss.name}</div><div className="boss-sub-text">{gate.boss.sub}</div></div>
+              <div className="boss-xp">+{gate.boss.xp} XP</div>
+            </div>
+            <div className="gate-note" style={cleared?{color:'var(--amber)'}:broken?{color:'var(--red)'}:{}}>
+              {cleared?'◆  GATE CLEARED — SEE YOU NEXT SUNDAY, HUNTER  ◆'
+                :broken?'◆  GATE BROKEN — THE DUNGEON COLLAPSED  ◆'
+                :active?'◆  COMPLETE ALL ROOMS TO FACE THE BOSS  ◆'
+                :'◆  GATE WAITING  ◆'}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RedGateSection({state, onCompleteRoom, onDefeatBoss, onFail}) {
+  const [open, setOpen] = useState(true);
+  const rg = RED_GATE_POOL.find(r => r.id === state.rgId);
+  if (!rg || state.rgKey !== getRGKey()) return null;
+  const roomsDone = state.rgRoomsDone || [];
+  const allDone   = roomsDone.length >= rg.rooms.length;
+  return (
+    <div>
+      <div className="gate-header" style={{borderTopColor:'rgba(255,51,85,0.4)',color:'var(--red)',animation:'gate-pulse 1.5s ease-in-out infinite'}}
+        onClick={()=>setOpen(o=>!o)}>
+        <i className="ti ti-alert-triangle" style={{fontSize:16}}/>
+        RED GATE — INSTANT DUNGEON
+        <span className="gate-chip" style={{borderColor:'rgba(255,51,85,0.5)',color:'var(--red)'}}>MUST CLEAR</span>
+        <div className="gate-hdr-line" style={{background:'linear-gradient(90deg,rgba(255,51,85,0.5),transparent)'}}/>
+        <i className={`ti ti-chevron-down inv-toggle-arrow${open?' open':''}`}/>
+      </div>
+      <div className={`gate-panel${open?' open':''}`}>
+        <div className="red-gate-card">
+          <div className="red-gate-title-row">
+            <div className="red-gate-icon">{rg.icon}</div>
+            <div style={{flex:1}}><div className="red-gate-name">{rg.name}</div></div>
+            {state.rgCleared
+              ? <div className="gate-status-badge status-cleared">ESCAPED</div>
+              : state.rgFailed
+              ? <div className="gate-status-badge status-broken">FAILED</div>
+              : <div className="gate-status-badge status-broken" style={{animation:'gate-pulse 1s ease-in-out infinite'}}>TRAPPED</div>}
+          </div>
+          <div className="red-gate-flavor">{rg.flavor}</div>
+          {!state.rgCleared && !state.rgFailed && (
+            <div className="red-gate-deadline">
+              <i className="ti ti-alert-triangle" style={{fontSize:14}}/>
+              YOU ARE TRAPPED — CLEAR THIS DUNGEON TODAY OR SUFFER THE CONSEQUENCES
+            </div>
+          )}
+          {rg.rooms.map((room,i) => {
+            const done    = roomsDone.includes(i);
+            const locked  = !done && i > 0 && !roomsDone.includes(i-1);
+            const canClick= !state.rgCleared && !state.rgFailed && !done && !locked;
+            return (
+              <div key={i} className={`red-gate-room${done?' done':''}${locked?' rg-locked':''}`}
+                onClick={()=>canClick&&onCompleteRoom(i)}>
+                <div className="rg-room-num">{done?<i className="ti ti-check" style={{fontSize:12,color:'var(--amber)'}}/>:(i+1)}</div>
+                <div style={{flex:1}}><div className="rg-room-name">{room.name}</div><div className="rg-room-sub">{room.sub}</div></div>
+                <div className="rg-room-xp">+{room.xp} XP</div>
+              </div>
+            );
+          })}
+          <div className={`red-gate-room${state.rgCleared?' done':''}${(!allDone||state.rgCleared||state.rgFailed)?' rg-locked':''}`}
+            style={{borderColor:'rgba(255,51,85,0.4)',background:'rgba(40,0,8,0.9)',marginBottom:0}}
+            onClick={()=>allDone&&!state.rgCleared&&!state.rgFailed&&onDefeatBoss()}>
+            <div className="rg-room-num" style={{borderColor:'rgba(255,51,85,0.5)',color:'var(--red)'}}><i className="ti ti-skull" style={{fontSize:13}}/></div>
+            <div style={{flex:1}}><div className="rg-room-name" style={{color:'#ffaaaa'}}>{rg.boss.name}</div><div className="rg-room-sub">{rg.boss.sub}</div></div>
+            <div className="rg-room-xp" style={{color:'var(--red)'}}>+{rg.boss.xp} XP</div>
+          </div>
+          {state.rgCleared
+            ? <div className="rg-cleared-note" style={{marginTop:16}}>◆  YOU ESCAPED THE DUNGEON  ◆</div>
+            : state.rgFailed
+            ? <div className="rg-failed-note" style={{marginTop:16}}>◆  THE DUNGEON COLLAPSED — IT CLAIMED ITS PRICE  ◆</div>
+            : <div className="red-gate-penalty" style={{marginTop:16}}>
+                <i className="ti ti-alert-triangle" style={{fontSize:12,verticalAlign:'-2px'}}/> &nbsp;
+                FAIL TO CLEAR TODAY: −{rg.penalty} XP + STREAK RESET &nbsp;<br/><br/>
+                <span style={{cursor:'pointer',color:'var(--red)',letterSpacing:2,textDecoration:'underline'}}
+                  onClick={onFail}>[ MARK AS FAILED ]</span>
+              </div>
+          }
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InventorySection({inventory, gateActive, onUse}) {
+  const [open, setOpen] = useState(false);
+  const active = (inventory||[]).filter(i=>!i.used);
+  return (
+    <>
+      <div className="inv-toggle" onClick={()=>setOpen(o=>!o)}>
+        <i className="ti ti-backpack" style={{fontSize:16}}/>
+        INVENTORY
+        <span className="chip" style={{borderColor:'rgba(255,170,0,0.4)',color:'var(--amber)'}}>{active.length} ITEM{active.length!==1?'S':''}</span>
+        <div className="inv-toggle-line"/>
+        <i className={`ti ti-chevron-down inv-toggle-arrow${open?' open':''}`}/>
+      </div>
+      <div className={`inv-panel${open?' open':''}`}>
+        {!(inventory&&inventory.length) ? (
+          <div className="inv-empty">◆ NO ITEMS YET — COMPLETE QUESTS TO EARN LOOT ◆</div>
+        ) : (
+          <div className="inv-grid">
+            {inventory.map((item,idx) => {
+              const tierIdx = TIER_ORDER.indexOf(item.tier);
+              const blocked = !item.used && gateActive && tierIdx <= 1;
+              return (
+                <div key={idx} className={`inv-item ${item.tier}${item.used?' consumed':''}`}>
+                  <div className="inv-item-qty">{item.used?'USED':'x'+(item.qty||1)}</div>
+                  <div className="inv-item-icon">{item.icon}</div>
+                  <div className="inv-item-name">{item.name}</div>
+                  <div className="inv-item-tier">{item.tier.toUpperCase()}</div>
+                  <div className="inv-item-reward">{item.reward}</div>
+                  {item.proofLog&&item.proofLog.length>0 && (
+                    <div className="inv-proof-log">
+                      {item.proofLog.map((p,pi)=>(
+                        <div key={pi} className="inv-proof-entry">◆ {p.note} <span style={{color:'var(--text3)'}}>({p.time})</span></div>
+                      ))}
+                    </div>
+                  )}
+                  {item.used
+                    ? <div className="inv-consumed-label">CONSUMED</div>
+                    : blocked
+                    ? <div className="inv-blocked">⚠ GATE ACTIVE — UNAVAILABLE</div>
+                    : <button className="inv-use-btn" onClick={()=>onUse(idx)}>USE ITEM</button>}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+function App() {
+  const [S, setS]         = useState(() => loadState());
+  const [saveDot, setSaveDot] = useState(false);
+  const [flash, setFlash]  = useState(null);   // {msg, type}
+  const [overlay, setOverlay] = useState(null); // {notif,rank,sub,btnText,cls, onClose}
+  const [loot, setLoot]    = useState(null);    // {item, source}
+  const [lootQ, setLootQ]  = useState([]);      // queued loot to show sequentially
+  const [proofItem, setProofItem] = useState(null); // {item, idx}
+  const [debuff, setDebuff] = useState(false);
+  const flashTimer = useRef(null);
+  const saveDotTimer = useRef(null);
+  const debuffTimer = useRef(null);
+
+  // Persist on every S change
+  useEffect(() => {
+    saveState(S);
+    setSaveDot(true);
+    if (saveDotTimer.current) clearTimeout(saveDotTimer.current);
+    saveDotTimer.current = setTimeout(() => setSaveDot(false), 1400);
+  }, [S]);
+
+  // On mount: check for missed days, red gate roll
+  useEffect(() => {
+    const today    = todayStr();
+    const lastSeen = localStorage.getItem(DATE_KEY);
+    if (!lastSeen) {
+      localStorage.setItem(DATE_KEY, today);
+    } else if (lastSeen !== today) {
+      const missed = daysBetween(lastSeen, today);
+      localStorage.setItem(DATE_KEY, today);
+      if (missed >= 1) {
+        const pen = missed * 40;
+        setS(prev => {
+          const next = {...prev, streak:0, done:{}, used:{}, day: prev.day + missed};
+          next.xp = Math.max(0, next.xp - pen);
+          return clampLevels(next);
+        });
+        showOverlay('[ SYSTEM PENALTY ]', missed===1?'YOU WERE ABSENT':missed+' DAYS MISSED',
+          'STREAK RESET  ◆  −'+pen+' XP', 'ACCEPT PUNISHMENT', 'pen');
+      } else {
+        showFlash('Progress restored — welcome back, Hunter.', 'info');
+      }
+    } else {
+      showFlash('Progress restored — welcome back, Hunter.', 'info');
+    }
+    // Red gate: only roll if not already rolled today
+    const rgKey = getRGKey();
+    setS(prev => {
+      if (prev.rgKey === rgKey) return prev;
+      if (Math.random() > 0.30) return prev;
+      const rg = RED_GATE_POOL[Math.floor(Math.random() * RED_GATE_POOL.length)];
+      const next = {...prev, rgKey, rgId:rg.id, rgRoomsDone:[], rgCleared:false, rgFailed:false};
+      setTimeout(() => {
+        showOverlay('[ RED GATE DETECTED ]', rg.name,
+          'AN INSTANT DUNGEON HAS APPEARED  ◆  YOU MUST CLEAR IT TODAY',
+          'ENTER THE GATE', 'pen');
+      }, 1200);
+      return next;
+    });
+  }, []);
+
+  // Process loot queue sequentially
+  useEffect(() => {
+    if (!loot && lootQ.length > 0) {
+      const [next, ...rest] = lootQ;
+      setLoot(next);
+      setLootQ(rest);
+    }
+  }, [loot, lootQ]);
+
+  function clampLevels(s) {
+    const ns = {...s};
+    while (ns.level > 1 && ns.xp < xpFor(ns.level-1)) ns.level--;
+    while (ns.xp >= xpFor(ns.level)) ns.level++;
+    return ns;
+  }
+
+  function showFlash(msg, type) {
+    setFlash({msg, type});
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setFlash(null), 4000);
+  }
+
+  function showOverlay(notif, rank, sub, btnText, cls, onCloseExtra) {
+    setOverlay({notif, rank, sub, btnText, cls, onCloseExtra});
+  }
+
+  function closeOverlay() {
+    const extra = overlay?.onCloseExtra;
+    setOverlay(null);
+    if (extra) extra();
+  }
+
+  function queueLoot(item, source) {
+    setLootQ(q => [...q, {item, source}]);
+  }
+
+  function checkLvlUp(prevLevel, newState) {
+    if (newState.level > prevLevel) {
+      showOverlay('[ SYSTEM NOTIFICATION ]', getRank(newState.level).label,
+        'LEVEL ' + newState.level + ' ACHIEVED', 'ACKNOWLEDGE', '');
+      const minTier = newState.level >= 50 ? 'epic' : newState.level >= 20 ? 'rare' : newState.level >= 10 ? 'uncommon' : 'common';
+      setTimeout(() => queueLoot(rollLoot(minTier), 'LEVEL UP REWARD'), 1800);
+      if (newState.level % 5 === 0) {
+        const nb = getBossForLevel(newState.level);
+        if (nb && newState.boss !== nb.id) {
+          setTimeout(() => {
+            setS(prev => ({...prev, boss: nb.id, bossProgress: 0}));
+            showOverlay('[ BOSS QUEST UNLOCKED ]', nb.name,
+              nb.days + '-DAY CHALLENGE · ' + nb.xp + ' XP', 'ACCEPT THE CHALLENGE', 'boss-win');
+          }, 2200);
+        }
+      }
+    }
+  }
+
+  function checkShadow(tid, ns, scheduleShow) {
+    let updated = false;
+    SHADOW_POOL.forEach(sh => {
+      if (sh.trigger === tid && !ns.shadowDone[sh.id]) {
+        ns.shadowDone = {...ns.shadowDone, [sh.id]: true};
+        ns.xp += sh.xp;
+        updated = true;
+        if (scheduleShow) {
+          setTimeout(() => showOverlay('[ SHADOW QUEST REVEALED ]', sh.reveal,
+            sh.rdesc + ' · +' + sh.xp + ' XP', 'ABSORB THE REWARD', 'shad'), 800);
+        }
+      }
+    });
+    return updated;
+  }
+
+  function toggleQuest(q) {
+    setS(prev => {
+      const ns = JSON.parse(JSON.stringify(prev));
+      const wasFirst = Object.values(ns.done).filter(Boolean).length === 0 && !ns.done[q.id];
+      if (ns.done[q.id]) {
+        ns.done[q.id] = false;
+        ns.xp = Math.max(0, ns.xp - q.xp);
+        ns.stats[q.stat] = Math.max(10, ns.stats[q.stat] - q.v);
+        if (ns.questCounts[q.id]) ns.questCounts[q.id] = Math.max(0, ns.questCounts[q.id]-1);
+        if (ns.questLoot && ns.questLoot[q.id]) {
+          const lootId = ns.questLoot[q.id];
+          const idx = ns.inventory.findIndex(i => i.id === lootId);
+          if (idx > -1) {
+            if (ns.inventory[idx].qty > 1) ns.inventory[idx].qty--;
+            else ns.inventory.splice(idx, 1);
+          }
+          delete ns.questLoot[q.id];
+          showFlash('Quest unmarked — −'+q.xp+' XP  ◆  Loot removed', 'bad');
+        } else {
+          showFlash('Quest unmarked — −'+q.xp+' XP', 'bad');
+        }
+      } else {
+        ns.done[q.id] = true;
+        ns.xp += q.xp;
+        ns.stats[q.stat] += q.v;
+        ns.questCounts[q.id] = (ns.questCounts[q.id] || 0) + 1;
+        showFlash('Quest complete — +'+q.xp+' XP  ◆  '+q.stat.toUpperCase()+' +'+q.v, 'ok');
+        if (Math.random() < 0.15) {
+          const dropped = rollLoot('common');
+          if (!ns.questLoot) ns.questLoot = {};
+          ns.questLoot[q.id] = dropped.id;
+          const existing = ns.inventory.find(i => i.id === dropped.id);
+          if (existing) existing.qty = (existing.qty||1)+1;
+          else ns.inventory.push({...dropped, qty:1, source:'QUEST DROP'});
+          setTimeout(() => queueLoot(dropped, 'QUEST DROP'), 600);
+        }
+        if (wasFirst)                              checkShadow('firstQuest', ns, true);
+        if (q.id==='book' && ns.questCounts['book']>=3)  checkShadow('book3', ns, true);
+        if (q.id==='bible'&& ns.questCounts['bible']>=5) checkShadow('bible5', ns, true);
+        if (DAILY_Q.every(dq => ns.done[dq.id]))         checkShadow('allDaily', ns, true);
+      }
+      const prevLevel = prev.level;
+      const clamped = clampLevels(ns);
+      checkLvlUp(prevLevel, clamped);
+      return clamped;
+    });
+  }
+
+  function toggleChallenge() {
+    const ch = getDailyChallenge();
+    setS(prev => {
+      const ns = {...prev};
+      if (ns.challengeDone) {
+        ns.challengeDone = false;
+        ns.xp = Math.max(0, ns.xp - ch.xp);
+        ns.stats = {...ns.stats, [ch.stat]: Math.max(10, ns.stats[ch.stat] - ch.v)};
+        showFlash('Challenge unmarked — −'+ch.xp+' XP', 'bad');
+      } else {
+        ns.challengeDone = true;
+        ns.xp += ch.xp;
+        ns.stats = {...ns.stats, [ch.stat]: ns.stats[ch.stat] + ch.v};
+        showFlash('Daily challenge complete — +'+ch.xp+' XP  ◆  '+ch.stat.toUpperCase()+' +'+ch.v, 'ok');
+      }
+      const prev2 = prev.level;
+      const clamped = clampLevels(ns);
+      checkLvlUp(prev2, clamped);
+      return clamped;
+    });
+  }
+
+  function progressBoss() {
+    setS(prev => {
+      if (!prev.boss) return prev;
+      const boss = BOSS_POOL.find(b => b.id === prev.boss);
+      if (!boss) return prev;
+      const ns = {...prev, bossProgress: prev.bossProgress + 1};
+      if (ns.bossProgress >= boss.days) {
+        ns.xp += boss.xp;
+        ns.stats = {...ns.stats, [boss.stat]: Math.max(1, ns.stats[boss.stat]+boss.v)};
+        ns.boss = null; ns.bossProgress = 0;
+        const prevLevel = prev.level;
+        const clamped = clampLevels(ns);
+        setTimeout(() => {
+          showOverlay('[ BOSS QUEST COMPLETE ]', boss.name,
+            'CHALLENGE CONQUERED · +'+boss.xp+' XP', 'CLAIM REWARD', 'boss-win');
+          setTimeout(() => queueLoot(rollLoot('rare'), 'BOSS QUEST REWARD'), 1800);
+        }, 400);
+        checkLvlUp(prevLevel, clamped);
+        return clamped;
+      }
+      showFlash('Boss progress: '+ns.bossProgress+'/'+boss.days+' days', 'info');
+      return ns;
+    });
+  }
+
+  function triggerViolation(v) {
+    setS(prev => {
+      if (prev.used[v.id]) return prev;
+      const ns = {...prev, used:{...prev.used, [v.id]:true}};
+      ns.xp = Math.max(0, ns.xp + v.xp);
+      ns.stats = {...ns.stats, [v.stat]: Math.max(1, ns.stats[v.stat] + v.v)};
+      setDebuff(true);
+      if (debuffTimer.current) clearTimeout(debuffTimer.current);
+      debuffTimer.current = setTimeout(() => setDebuff(false), 8000);
+      showFlash('Violation logged — '+Math.abs(v.xp)+' XP lost  ◆  '+v.stat.toUpperCase()+' '+v.v, 'bad');
+      return clampLevels(ns);
+    });
+  }
+
+  function completeGateRoom(idx) {
+    const rankLabel = getRank(S.level).label;
+    const gate = GATE_RANKS[rankLabel] || GATE_RANKS['E-RANK HUNTER'];
+    setS(prev => {
+      const ns = JSON.parse(JSON.stringify(prev));
+      const done = ns.gateRoomsDone || [];
+      if (done.includes(idx)) return prev;
+      if (idx > 0 && !done.includes(idx-1)) { showFlash('Complete the previous room first, Hunter.','bad'); return prev; }
+      ns.gateRoomsDone = [...done, idx];
+      const room = gate.rooms[idx];
+      ns.xp += room.xp; ns.stats[room.stat] = Math.max(1, ns.stats[room.stat]+room.v);
+      showFlash('Room cleared — +'+room.xp+' XP  ◆  '+room.stat.toUpperCase()+' +'+room.v, 'ok');
+      if (Math.random() < 0.25) setTimeout(() => queueLoot(rollLoot('common'),'GATE ROOM DROP'), 600);
+      const pL = prev.level; const clamped = clampLevels(ns); checkLvlUp(pL, clamped);
+      return clamped;
+    });
+  }
+
+  function defeatGateBoss() {
+    const rankLabel = getRank(S.level).label;
+    const gate = GATE_RANKS[rankLabel] || GATE_RANKS['E-RANK HUNTER'];
+    const roomsDone = S.gateRoomsDone || [];
+    if (roomsDone.length < gate.rooms.length) { showFlash('Clear all rooms before facing the boss.','bad'); return; }
+    setS(prev => {
+      const ns = {...prev};
+      ns.xp += gate.boss.xp; ns.stats = {...ns.stats, [gate.boss.stat]: Math.max(1, ns.stats[gate.boss.stat]+gate.boss.v)};
+      ns.gateCleared = true; ns.gateWeek = getGateKey();
+      const pL = prev.level; const clamped = clampLevels(ns); checkLvlUp(pL, clamped);
+      setTimeout(() => {
+        showOverlay('[ GATE CLEARED ]', gate.boss.name, 'GATE CONQUERED  ◆  +'+gate.boss.xp+' XP', 'CLAIM VICTORY', 'boss-win');
+        setTimeout(() => queueLoot(rollLoot(gate.loot), 'GATE BOSS REWARD'), 2200);
+      }, 400);
+      return clamped;
+    });
+  }
+
+  function completeRGRoom(idx) {
+    const rg = RED_GATE_POOL.find(r => r.id === S.rgId);
+    if (!rg || S.rgCleared || S.rgFailed) return;
+    setS(prev => {
+      const ns = JSON.parse(JSON.stringify(prev));
+      const done = ns.rgRoomsDone || [];
+      if (done.includes(idx)) return prev;
+      if (idx > 0 && !done.includes(idx-1)) { showFlash('Complete the previous room first.','bad'); return prev; }
+      ns.rgRoomsDone = [...done, idx];
+      const room = rg.rooms[idx];
+      ns.xp += room.xp; ns.stats[room.stat] = Math.max(1, ns.stats[room.stat]+room.v);
+      showFlash('Room cleared — +'+room.xp+' XP  ◆  '+room.stat.toUpperCase()+' +'+room.v, 'ok');
+      const pL = prev.level; const clamped = clampLevels(ns); checkLvlUp(pL, clamped);
+      return clamped;
+    });
+  }
+
+  function defeatRGBoss() {
+    const rg = RED_GATE_POOL.find(r => r.id === S.rgId);
+    if (!rg || S.rgCleared || S.rgFailed) return;
+    if ((S.rgRoomsDone||[]).length < rg.rooms.length) { showFlash('Clear all rooms first, Hunter.','bad'); return; }
+    setS(prev => {
+      const ns = {...prev};
+      ns.xp += rg.boss.xp; ns.stats = {...ns.stats, [rg.boss.stat]: Math.max(1, ns.stats[rg.boss.stat]+rg.boss.v)};
+      ns.rgCleared = true;
+      const pL = prev.level; const clamped = clampLevels(ns); checkLvlUp(pL, clamped);
+      setTimeout(() => {
+        showOverlay('[ INSTANT DUNGEON CLEARED ]', rg.boss.name, 'YOU ESCAPED  ◆  +'+rg.boss.xp+' XP', 'CLAIM VICTORY', 'boss-win');
+        setTimeout(() => queueLoot(rollLoot(rg.loot), 'RED GATE REWARD'), 2200);
+      }, 400);
+      return clamped;
+    });
+  }
+
+  function failRedGate() {
+    const rg = RED_GATE_POOL.find(r => r.id === S.rgId);
+    if (!rg || S.rgCleared || S.rgFailed) return;
+    setS(prev => {
+      const ns = {...prev, rgFailed:true, streak:0};
+      ns.xp = Math.max(0, ns.xp - rg.penalty);
+      return clampLevels(ns);
+    });
+    showOverlay('[ GATE BREAK — INSTANT DUNGEON ]', rg.name,
+      'DUNGEON COLLAPSED  ◆  −'+rg.penalty+' XP  ◆  STREAK RESET', 'FACE THE CONSEQUENCE', 'pen');
+  }
+
+  function endDay() {
+    const missed = DAILY_Q.filter(q => !S.done[q.id]);
+    if (missed.length) {
+      const pen = missed.length * 10;
+      setS(prev => {
+        const ns = {...prev, challengeDone:false, done:{}, used:{}, day:prev.day+1};
+        ns.xp = Math.max(0, ns.xp - pen);
+        return clampLevels(ns);
+      });
+      showFlash('Day ended — '+missed.length+' missed  ◆  −'+pen+' XP', 'bad');
+    } else {
+      setS(prev => {
+        const ns = {...prev, challengeDone:false, done:{}, used:{}, day:prev.day+1, streak:prev.streak+1};
+        // check cleanDay shadow
+        const nsCopy = JSON.parse(JSON.stringify(ns));
+        if (Object.keys(prev.used).length === 0) checkShadow('cleanDay', nsCopy, true);
+        return {...ns, shadowDone: nsCopy.shadowDone, xp: nsCopy.xp};
+      });
+      showFlash('All obligations met — day complete!', 'ok');
+    }
+    localStorage.setItem(DATE_KEY, todayStr());
+    // Red gate roll for next day
+    const rgKey = getRGKey();
+    setS(prev => {
+      if (prev.rgKey === rgKey) return prev;
+      if (Math.random() > 0.30) return prev;
+      const rg = RED_GATE_POOL[Math.floor(Math.random() * RED_GATE_POOL.length)];
+      const next = {...prev, rgKey, rgId:rg.id, rgRoomsDone:[], rgCleared:false, rgFailed:false};
+      setTimeout(() => showOverlay('[ RED GATE DETECTED ]', rg.name,
+        'AN INSTANT DUNGEON HAS APPEARED  ◆  YOU MUST CLEAR IT TODAY', 'ENTER THE GATE','pen'), 1200);
+      return next;
+    });
+  }
+
+  function clearToday() {
+    if (!confirm('Clear all of today\'s progress? Streak and day count stay intact.')) return;
+    setS(prev => {
+      const ns = DEF();
+      ns.streak = prev.streak; ns.day = prev.day;
+      ns.gateWeek = prev.gateWeek; ns.gateRoomsDone = prev.gateRoomsDone;
+      ns.gateCleared = prev.gateCleared; ns.gateBroken = prev.gateBroken;
+      ns.rgKey = prev.rgKey; ns.rgId = prev.rgId; ns.rgRoomsDone = prev.rgRoomsDone;
+      ns.rgCleared = prev.rgCleared; ns.rgFailed = prev.rgFailed;
+      ns.boss = prev.boss; ns.bossProgress = prev.bossProgress;
+      return ns;
+    });
+    showFlash('Today cleared — fresh start, Hunter.', 'info');
+  }
+
+  function clearSave() {
+    if (!confirm('Wipe all saved data and start fresh?')) return;
+    localStorage.removeItem(KEY);
+    localStorage.removeItem(DATE_KEY);
+    window.location.reload();
+  }
+
+  function useItem(idx) {
+    const item = S.inventory[idx];
+    if (!item || item.used) return;
+    const tierIdx = TIER_ORDER.indexOf(item.tier);
+    const gateActive = isGateActiveNow();
+    if (tierIdx === 0 && gateActive) { showFlash('Cannot use Common items while a Gate is active.','bad'); return; }
+    if (tierIdx <= 1 && gateActive)  { showFlash('Cannot use Common or Uncommon items while a Gate is active.','bad'); return; }
+    setProofItem({item, idx});
+  }
+
+  function confirmItemUse(proofText) {
+    const {item, idx} = proofItem;
+    const ts = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    setS(prev => {
+      const ns = JSON.parse(JSON.stringify(prev));
+      const it = ns.inventory[idx];
+      if (!it.proofLog) it.proofLog = [];
+      it.proofLog.push({note: proofText, time: ts});
+      if (it.qty > 1) it.qty--;
+      else it.used = true;
+      return ns;
+    });
+    setProofItem(null);
+    const cls = item.tier==='legendary'||item.tier==='epic' ? 'boss-win' : item.tier==='rare' ? 'shad' : '';
+    showOverlay('[ REWARD ACTIVATED ]', item.name, proofText.toUpperCase(), 'ENJOY IT, HUNTER', cls);
+  }
+
+  function isGateActiveNow() {
+    const rankLabel = getRank(S.level).label;
+    const gate = GATE_RANKS[rankLabel] || GATE_RANKS['E-RANK HUNTER'];
+    const cleared = S.gateWeek === getGateKey() && S.gateCleared;
+    const broken  = S.gateWeek === getGateKey() && S.gateBroken;
+    const gateActive = isSunday() && !cleared && !broken;
+    const rgActive = S.rgKey === getRGKey() && !S.rgCleared && !S.rgFailed;
+    const gateRoomsDone = S.gateRoomsDone || [];
+    return (gateActive && gateRoomsDone.length < gate.rooms.length) || rgActive;
+  }
+
+  // ── Derived values ──
+  const rank    = getRank(S.level);
+  const need    = xpFor(S.level);
+  const prev    = S.level === 1 ? 0 : xpFor(S.level - 1);
+  const pct     = Math.min(100, Math.round(((S.xp - prev) / (need - prev)) * 100));
+  const doneCount = DAILY_Q.filter(q => S.done[q.id]).length;
+  const ch      = getDailyChallenge();
+  const boss    = S.boss ? BOSS_POOL.find(b => b.id === S.boss) : null;
+  const sundayNow = isSunday();
+
+  return (
+    <>
+      <ProofModal
+        show={!!proofItem}
+        item={proofItem?.item}
+        onClose={()=>setProofItem(null)}
+        onConfirm={confirmItemUse}
+      />
+
+      <LootOverlay
+        show={!!loot}
+        item={loot?.item}
+        source={loot?.source}
+        onClose={()=>setLoot(null)}
+      />
+
+      <Overlay
+        show={!!overlay}
+        notif={overlay?.notif}
+        rank={overlay?.rank}
+        sub={overlay?.sub}
+        btnText={overlay?.btnText}
+        cls={overlay?.cls}
+        onClose={closeOverlay}
+      />
+
+      <div className="frame">
+        <Corners/>
+        <div className="scanlines"/>
+        <div className="frame-inner">
+
+          {/* Header */}
+          <div className="hdr">
+            <div className="hdr-sys">◆ &nbsp; S Y S T E M &nbsp; ◆ <span className={`save-dot${saveDot?' show':''}`}/></div>
+            <div className="hdr-name">HUNTER &nbsp;·&nbsp; DREW</div>
+            <div className="hdr-day">DAY <span>{S.day}</span> &nbsp;&nbsp;◆&nbsp;&nbsp; ACTIVE</div>
+            <div className="rank-wrap">
+              <div className="rank-deco"/>
+              <div className="rank-badge">{rank.label}</div>
+              <div className="rank-deco r"/>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="stat-grid">
+            {[{k:'str',lbl:'STR',name:'Strength'},{k:'agi',lbl:'AGI',name:'Agility'},{k:'int',lbl:'INT',name:'Intelligence'},{k:'vit',lbl:'VIT',name:'Vitality'}].map(({k,lbl,name})=>(
+              <div key={k} className="stat-box">
+                <div className="stat-lbl">{lbl}</div>
+                <div className="stat-val">{S.stats[k]}</div>
+                <div className="stat-name">{name}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* XP Bar */}
+          <div className="xp-wrap">
+            <div className="xp-top"><span>EXPERIENCE POINTS</span><span>{S.xp} &nbsp;/&nbsp; {need}</span></div>
+            <div className="xp-track"><div className="xp-fill" style={{width:pct+'%'}}/></div>
+            <div className="xp-bot"><span>LEVEL &nbsp;{S.level}</span><span>{Math.max(0,need-S.xp)} XP TO NEXT LEVEL</span></div>
+          </div>
+
+          {/* Flash */}
+          {flash && (
+            <div className={`flash ${flash.type}`}>
+              <i className="ti ti-info-circle" style={{fontSize:15}}/>
+              <span>{flash.msg}</span>
+            </div>
+          )}
+
+          {/* Daily Obligations */}
+          <div className="sec req">
+            <i className="ti ti-shield-bolt" style={{fontSize:16}}/>
+            DAILY OBLIGATIONS
+            <span className="chip">{doneCount}/4 COMPLETE</span>
+            <div className="sec-line"/>
+          </div>
+          <div className="prog-bar"><div className="prog-fill" style={{width:Math.round((doneCount/DAILY_Q.length)*100)+'%'}}/></div>
+          <div className="q-list">
+            {DAILY_Q.map(q => (
+              <QuestItem key={q.id} q={q} done={!!S.done[q.id]} cls="" xpCls="up" onClick={()=>toggleQuest(q)}/>
+            ))}
+          </div>
+
+          {/* Bonus Quests */}
+          <div className="sec bon">
+            <i className="ti ti-star" style={{fontSize:16}}/>
+            BONUS QUESTS
+            <span className="chip">OPTIONAL · EXTRA XP</span>
+            <div className="sec-line"/>
+          </div>
+          <div className="q-list">
+            {BONUS_Q.map(q => (
+              <QuestItem key={q.id} q={q} done={!!S.done[q.id]} cls="bon" xpCls="ba" onClick={()=>toggleQuest(q)}/>
+            ))}
+          </div>
+
+          {/* Daily Challenge */}
+          <div className="sec spec">
+            <i className="ti ti-bolt" style={{fontSize:16}}/>
+            DAILY CHALLENGE
+            <span className="chip">RESETS AT MIDNIGHT</span>
+            <div className="sec-line"/>
+          </div>
+          <div className="q-list">
+            <div className={`q-item dc${S.challengeDone?' done':''}`} onClick={toggleChallenge}>
+              <div className="q-check">{S.challengeDone && <i className="ti ti-check"/>}</div>
+              <div style={{flex:1}}><div className="q-name">{ch.name}</div><div className="q-sub">{ch.sub}</div></div>
+              <div className="q-xp bp">+{ch.xp} XP</div>
+            </div>
+          </div>
+
+          {/* Boss Quest */}
+          {boss && (
+            <>
+              <div className="sec boss">
+                <i className="ti ti-sword" style={{fontSize:16}}/>
+                BOSS QUEST
+                <span className="chip">{S.bossProgress}/{boss.days} DAYS</span>
+                <div className="sec-line"/>
+              </div>
+              <div className="q-list">
+                <div className="q-item bq" onClick={progressBoss}>
+                  <div className="q-check"><i className="ti ti-sword" style={{fontSize:13,color:'var(--shadow-c)'}}/></div>
+                  <div style={{flex:1}}>
+                    <div className="q-name">{boss.name}</div>
+                    <div className="q-sub">{boss.sub}</div>
+                    <div className="boss-days">PROGRESS: {S.bossProgress}/{boss.days} DAYS</div>
+                    <div className="boss-prog-track"><div className="boss-prog-fill" style={{width:Math.round((S.bossProgress/boss.days)*100)+'%'}}/></div>
+                  </div>
+                  <div className="q-xp bs">+{boss.xp} XP</div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Shadow Quests */}
+          <div className="sec spec">
+            <i className="ti ti-eye-off" style={{fontSize:16}}/>
+            SHADOW QUESTS
+            <span className="chip">HIDDEN</span>
+            <div className="sec-line"/>
+          </div>
+          <div className="q-list">
+            {SHADOW_POOL.map(sh => {
+              const done = !!S.shadowDone[sh.id];
+              return (
+                <div key={sh.id} className={`q-item shq${done?' done':''}`}>
+                  <div className="q-check">{done && <i className="ti ti-check" style={{color:'var(--purple)'}}/>}</div>
+                  <div style={{flex:1}}>
+                    <div className="q-name">{done ? sh.reveal : sh.name}</div>
+                    <div className="q-sub">{done ? sh.rdesc : sh.sub}</div>
+                  </div>
+                  <div className={`q-xp ${done?'bp':'bh'}`}>{done ? '+'+sh.xp+' XP' : '??? XP'}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="div-line"/>
+
+          {/* Violations */}
+          <div className="vio-hdr">
+            <i className="ti ti-skull" style={{fontSize:16}}/>
+            VIOLATION LOG
+            <div className="vio-hdr-line"/>
+          </div>
+          <div className="v-list">
+            {VIOLATIONS.map(v => {
+              const used = !!S.used[v.id];
+              return (
+                <div key={v.id} className={`v-item${used?' used':''}`} onClick={()=>!used&&triggerViolation(v)}>
+                  <div className="v-ico"><i className={`ti ${v.ico}`}/></div>
+                  <div style={{flex:1}}>
+                    <div className="v-name">{v.name}</div>
+                    <div className="v-sub">{v.sub}</div>
+                  </div>
+                  <div className="v-pen">{v.xp} XP</div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Gate */}
+          <GateSection
+            state={S}
+            isSundayNow={sundayNow}
+            onCompleteRoom={completeGateRoom}
+            onDefeatBoss={defeatGateBoss}
+          />
+
+          {/* Red Gate */}
+          <RedGateSection
+            state={S}
+            onCompleteRoom={completeRGRoom}
+            onDefeatBoss={defeatRGBoss}
+            onFail={failRedGate}
+          />
+
+          {/* Inventory */}
+          <InventorySection
+            inventory={S.inventory}
+            gateActive={isGateActiveNow()}
+            onUse={useItem}
+          />
+
+          {/* Footer */}
+          <div className="ftr">
+            <div className="streak-wrap">
+              <i className="ti ti-flame" style={{fontSize:24,color:'var(--amber)'}}/>
+              <div>
+                <div className="streak-lbl">STREAK</div>
+                <div style={{display:'flex',alignItems:'baseline',gap:8}}>
+                  <div className="streak-val">{S.streak}</div>
+                  <div className="streak-days">DAYS</div>
+                </div>
+              </div>
+            </div>
+            {debuff && <div className="debuff">◆ DEBUFFED ◆</div>}
+            <div className="btn-row">
+              <button className="btn btn-reset" onClick={clearToday}>CLEAR TODAY</button>
+              <button className="btn btn-reset" onClick={clearSave}>CLEAR SAVE</button>
+              <button className="btn btn-end" onClick={endDay}>END DAY</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>
